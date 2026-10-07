@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# Root marker for hardware-specs-docs (driver-lab, board-expert/SPEC-FORMAT.md). license: is this
+# repository's license; accepts: lists the SPDX licenses a cited source may carry.
+# No source tree: documents only, cited by name ([doc:<name> p.N]).
+layer: public
+name: hardware-specs-docs
+license: CC-BY-4.0
+accepts: []
