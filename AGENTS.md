@@ -31,8 +31,11 @@ Instructions for coding agents working in this repository. The user guide is the
   repository's license policy, which is the user's decision. Do not add the self-test's fixture
   specs to `specs/`.
 - **License headers:** every file except the license texts carries
-  `SPDX-FileCopyrightText: 2026 contributors` and its `SPDX-License-Identifier`, as an HTML
-  comment in Markdown, after the front matter when there is one.
+  `SPDX-FileCopyrightText: 2026 contributors` and its `SPDX-License-Identifier`. In a spec
+  (`specs/**/*.md`) they are YAML comment lines (`# SPDX-...`) inside the front matter, right
+  after the opening `---`, because the spec Markdown profile allows no HTML in a spec
+  (driver-lab's `board-expert/SPEC-FORMAT.md`); in other Markdown, an HTML comment after the
+  front matter when there is one.
 - **Privacy:** this repository is public. No host names, addresses, user names or home paths in
   any file or commit message.
 - **Git:** a topic branch and a pull request per change; push or open a pull request only on the
