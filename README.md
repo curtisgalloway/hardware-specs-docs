@@ -94,7 +94,9 @@ git clone https://github.com/curtisgalloway/driver-lab ../driver-lab
 scripts/checks.sh all ../driver-lab
 ```
 
-The script needs bash and python3 (standard library only).
+The script needs bash and python3 with markdown-it-py 4.2.0, which the checkers read Markdown
+with: it uses `uv run --with markdown-it-py==4.2.0` when uv is installed, or the interpreter in
+`CHECKS_PYTHON`, and exits 3 (`missing dependency`) when neither has the package.
 
 Check out the driver-lab commit that `.github/workflows/checks.yml` pins for an identical run.
 
