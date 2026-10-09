@@ -1,0 +1,403 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+format: 2
+kind: board
+id: rock5t
+name: Radxa ROCK 5T
+triggers: [rock 5t, rock5t, radxa rock 5t, rock-5t]
+not_triggers: [rock 5b, rock 5b plus, rock 5 itx, rock 5a, rock 5c]
+parts: [rk3588]
+cache: rock5t-resources
+resources:
+  documents:
+    - name: rock5t-schematic
+      class: doc
+      title: Radxa ROCK 5T schematic, V1.2
+      revision: "V1.2, 2025-01-09 (36 sheets)"
+      url: https://dl.radxa.com/rock5/5t/docs/hw/radxa_rock5t_schematic_v1.2_20250109.pdf
+      sha256: 82144737b9848a7784d800c4f6110029997e2a557a0667a9f38f0b793d334491
+      pages: 36
+      page_numbering: printed
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+      note: >-
+        Linked from Radxa's ROCK 5T download page. Page numbers are sheet numbers, which equal PDF
+        page numbers. The ROCK 5T Industrial (V2.01) has its own schematic, not read for this draft.
+    - name: rock5t-product-brief
+      class: doc
+      title: Radxa ROCK 5T Product Brief (RAD-DOC-0117)
+      revision: "1.4, 2026-08-05"
+      url: https://dl.radxa.com/rock5/5t/docs/rad-doc-0117_radxa_rock5t_product_brief__revision_1.4_gd4f9b5b.pdf
+      sha256: 4d1f0f030114abed6e73cc6844aafa1e02c1f2b7ee602ed304cf38dec0c891b4
+      pages: 13
+      page_numbering: printed
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+      note: Printed page numbers are one less than PDF page numbers (the cover is unnumbered).
+    - name: radxa-docs-serial
+      class: doc
+      title: Radxa documentation, UART serial console (shared page used by the ROCK 5T docs)
+      url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/general/_serial.mdx
+      commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+      note: >-
+        Rendered at https://docs.radxa.com/en/rock5/rock5t/radxa-os/serial with the Rockchip
+        ("rk") sections shown; the repository declares no license.
+    - name: radxa-docs-maskrom-linux
+      class: doc
+      title: Radxa documentation, ROCK 5T flashing via Maskrom from a Linux PC
+      url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/rock5/rock5t/low-level-dev/maskrom/linux.md
+      commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+      note: Rendered at https://docs.radxa.com/en/rock5/rock5t/low-level-dev/maskrom/linux; the ROCK 5T steps fill the shared page's "Enter to Maskrom" section.
+    - name: radxa-docs-rkdeveloptool
+      class: doc
+      title: Radxa documentation, rkdeveloptool (shared page included by the ROCK 5T Maskrom page)
+      url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/dev/_rkdeveloptoolV2.mdx
+      commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+    - name: radxa-docs-uboot
+      class: doc
+      title: Radxa documentation, U-Boot development (shared page, ROCK 5T row)
+      url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/dev/_u-boot.mdx
+      commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+    - name: radxa-docs-nvme
+      class: doc
+      title: Radxa documentation, installing the system to NVMe (shared page used by the ROCK 5T docs)
+      url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/dev/_nvme.mdx
+      commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+    - name: uboot-docs-rockchip
+      class: doc
+      title: U-Boot documentation, Rockchip boards (doc/board/rockchip/rockchip.rst), v2026.10
+      url: https://github.com/u-boot/u-boot/blob/5508406582f6f7120dce0c4b3059819a41788db2/doc/board/rockchip/rockchip.rst
+      commit: 5508406582f6f7120dce0c4b3059819a41788db2
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+    - name: uboot-docs-booti
+      class: doc
+      title: U-Boot documentation, booti command (doc/usage/cmd/booti.rst), v2026.10
+      url: https://github.com/u-boot/u-boot/blob/5508406582f6f7120dce0c4b3059819a41788db2/doc/usage/cmd/booti.rst
+      commit: 5508406582f6f7120dce0c4b3059819a41788db2
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+    - name: linux-booting
+      class: standard
+      title: Linux arm64 boot protocol (Documentation/arch/arm64/booting.rst), Linux v7.2
+      url: https://github.com/torvalds/linux/blob/8d3ae59288f1e7d58d76558a6ee96d533bc5019f/Documentation/arch/arm64/booting.rst
+      commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+orientation: >-
+  The Radxa ROCK 5T is an RK3588 board with 64-bit LPDDR5, onboard eMMC, SPI NOR flash, a
+  microSD slot, two M.2 M-key PCIe 3.0 slots and two 2.5 GbE ports. This spec covers what a
+  first bring-up needs: the debug console, the boot chain and kernel entry, boot media and the
+  ROM's boot order, and Maskrom recovery. It rests only on Radxa's and U-Boot's documents and
+  the Linux boot protocol; the Linux, device-tree and U-Boot source view is the GPL overlay in
+  hardware-specs-gpl. The schematic read is V1.2; the ROCK 5T Industrial (V2.01) is not covered.
+facts:
+  - id: cpu-complex
+    section: quick-facts
+    title: SoC and CPU complex
+    claim: >-
+      The ROCK 5T carries a Rockchip RK3588 or RK3588J with four Cortex-A76 cores (2.2 or 2.4 GHz)
+      and four Cortex-A55 cores (1.8 GHz) in an Arm DynamIQ configuration.
+    support:
+      - class: doc
+        doc: rock5t-product-brief
+        at: [{section: "3.1", page: "4"}]
+    todo:
+      check: document
+      text: which SKUs carry the RK3588J (industrial grade) is not stated; check the order information and Radxa's Industrial variant documents.
+
+  - id: debug-console
+    section: quick-facts
+    title: Debug console
+    critical: true
+    claim: >-
+      The debug console is on the 40-pin header: pin 8 is TX, pin 10 is RX, pin 6 is ground, at
+      1500000 baud, 8N1, no flow control. Radxa warns that some CP210x and PL2303 adapters cannot
+      run at 1.5 Mbaud and that some FT232RL adapters cause power problems.
+    support:
+      - class: doc
+        doc: radxa-docs-serial
+        at:
+          - {heading: opening paragraph}
+          - {heading: Preparation}
+          - {heading: Serial Connection}
+
+  - id: debug-console-is-uart2-m0
+    section: quick-facts
+    title: The console pins are UART2 M0
+    critical: true
+    claim: >-
+      Header pin 8 is SoC pin GPIO0_B5 (UART2_TX_M0) and pin 10 is GPIO0_B6 (UART2_RX_M0), each
+      through a 100 Ω series resistor (R442, R443). So the console is
+      UART2 with its M0 pin multiplexing.
+    support:
+      - class: doc
+        doc: rock5t-schematic
+        at: [{page: "36", heading: 40pin/LED/RTC/EEPROM}]
+      - class: doc
+        doc: rock5t-product-brief
+        at: [{section: "6.1.1", page: "8"}]
+    relates:
+      - {fact: "rk3588#uart2-pinmux", relation: qualifies}
+
+  - id: uart2-state-at-handoff
+    section: quick-facts
+    title: UART2 state the firmware leaves
+    critical: true
+    claim: >-
+      Whether the stock firmware leaves UART2's M0 pin multiplexing set, its baud clock running
+      and its divisor programmed for 1500000 baud at kernel entry, so that polled transmit writes
+      work without touching the clock or pin controllers, is not stated by any document read here.
+    todo:
+      check: hardware
+      text: >-
+        at kernel entry, write a byte to UART2's transmit register without other setup and watch
+        the header; then read back the pin multiplexing and divisor registers the GPL overlay
+        names.
+    relates:
+      - {fact: "rk3588#uart2-pinmux", relation: qualifies}
+
+  - id: stock-loader
+    section: quick-facts
+    title: The stock loader is Radxa's vendor U-Boot
+    critical: true
+    claim: >-
+      Radxa builds the ROCK 5T's U-Boot from its BSP tool with the `rk2410` profile, the same as
+      the ROCK 5B; the profile produces packages named `u-boot-rk2410_2017.09-…`, a U-Boot 2017.09
+      base, not mainline U-Boot.
+    support:
+      - class: doc
+        doc: radxa-docs-uboot
+        at: [{heading: Build U-Boot}]
+
+  - id: mainline-boot-chain
+    section: quick-facts
+    title: Mainline boot chain
+    claim: >-
+      Mainline U-Boot supports the ROCK 5T through the `rock5b-rk3588` configuration (it lists
+      "Radxa ROCK 5B/5B+/5T"). An arm64 Rockchip image needs TF-A's BL31; where U-Boot cannot
+      initialize DRAM, Rockchip's DDR binary from `rkbin` is packaged as the TPL. The single
+      `u-boot-rockchip.bin` image (TPL, SPL, then U-Boot proper with BL31) is written at sector 64
+      of an SD card, and `u-boot-rockchip-spi.bin` at offset 0 of SPI flash.
+    support:
+      - class: doc
+        doc: uboot-docs-rockchip
+        at:
+          - {heading: Rockchip boards}
+          - {heading: TF-A}
+          - {heading: TPL}
+          - {heading: Package the image with U-Boot TPL/SPL}
+    todo:
+      check: source
+      text: the order TPL, SPL, BL31, U-Boot proper is read from U-Boot's packaging; confirm it on the console of a mainline boot.
+
+  - id: kernel-entry-contract
+    section: quick-facts
+    title: Kernel entry contract
+    critical: true
+    claim: >-
+      An arm64 loader enters the kernel with `x0` = the physical address of the device tree,
+      `x1`–`x3` = 0, all of DAIF masked, the MMU off, in non-secure EL2 (recommended) or EL1, with
+      CNTFRQ programmed and CNTVOFF consistent on all CPUs. Which exception level the ROCK 5T's
+      stock loader actually uses is not stated by the documents read here.
+    support:
+      - class: standard
+        doc: linux-booting
+        at:
+          - {heading: 4. Call the kernel image}
+    todo:
+      check: hardware
+      text: read CurrentEL in the kernel shim's first instructions under the stock loader and under mainline U-Boot.
+
+  - id: kernel-image-format
+    section: quick-facts
+    title: Kernel image format and placement
+    critical: true
+    claim: >-
+      U-Boot's `booti` boots an arm64 `Image`, flat or compressed (compressed needs
+      `kernel_comp_addr_r` and `kernel_comp_size` set); without an address it uses
+      `CONFIG_SYS_LOAD_ADDR`. The Image must sit `text_offset` bytes above a 2 MB-aligned base in
+      usable RAM with `image_size` bytes free; the device tree must be 8-byte aligned and at most
+      2 MB. Where the stock loader loads the kernel by default is not stated by the documents
+      read here.
+    support:
+      - class: doc
+        doc: uboot-docs-booti
+        at: [{heading: Description}]
+      - class: standard
+        doc: linux-booting
+        at:
+          - {heading: 2. Setup the device tree}
+          - {heading: 4. Call the kernel image}
+    todo:
+      check: hardware
+      text: print the stock loader's environment (kernel_addr_r, fdt_addr_r) on the console.
+
+  - id: ram-options
+    section: quick-facts
+    title: RAM options
+    claim: >-
+      64-bit LPDDR5 in 4, 8, 16, 24 or 32 GB (order codes D4 to D32), as two 32-bit channels.
+    support:
+      - class: doc
+        doc: rock5t-product-brief
+        at:
+          - {section: "3.1", page: "4"}
+          - {section: "7", page: "11"}
+      - class: doc
+        doc: rock5t-schematic
+        at: [{page: "15", heading: LPDDR5_315P_2X32bit}]
+
+  - id: ram-map-and-reservations
+    section: quick-facts
+    title: RAM map and firmware reservations
+    critical: true
+    claim: >-
+      Where each RAM size appears in the physical map, and which ranges the boot firmware (BL31,
+      OP-TEE if present) reserves or writes outside its reservations, is not stated by any
+      document read here; see `rk3588#address-map`.
+    todo:
+      check: hardware
+      text: >-
+        dump the memory node and reserved-memory and memreserve entries of the device tree the
+        stock loader passes, for each RAM size available.
+    relates:
+      - {fact: "rk3588#address-map", relation: qualifies}
+
+  - id: boot-order-strap
+    section: quick-facts
+    title: Boot order strap
+    critical: true
+    claim: >-
+      The boot ROM reads the boot mode from SARADC input 0 (`BOOT_SARADC_IN0`). On the ROCK 5T it
+      is pulled to 1.8 V by R1511 (100 kΩ) with the pull-down R1509 not fitted, which the
+      schematic's table names level 7: the ROM tries FSPI M2, FSPI M1, FSPI M0, eMMC, SD card,
+      then USB.
+    support:
+      - class: doc
+        doc: rock5t-schematic
+        at: [{page: "13", heading: BOOT MODE CONFIG}]
+
+  - id: maskrom-strap
+    section: quick-facts
+    title: Maskrom button
+    critical: true
+    claim: >-
+      The Maskrom button (SW1) shorts `BOOT_SARADC_IN0` to ground, which the schematic's table
+      names level 1, "USB (Maskrom mode)": held at power-on, the ROM skips storage and waits for
+      code over USB.
+    support:
+      - class: doc
+        doc: rock5t-schematic
+        at: [{page: "13", heading: BOOT MODE CONFIG}]
+      - class: doc
+        doc: rock5t-product-brief
+        at: [{section: "3.2", page: "5"}]
+
+  - id: maskrom-recovery
+    section: quick-facts
+    title: Maskrom recovery with rkdeveloptool
+    claim: >-
+      To enter Maskrom: remove the microSD card and power, hold the Maskrom button, connect the
+      Type-C port to the host and power the board. Then `rkdeveloptool db <loader>` loads
+      Rockchip's SPL loader (`rk3588_spl_loader_….bin`), `rkdeveloptool wl 0 <image>` writes an
+      uncompressed image from sector 0 of the one storage device it finds, and `rkdeveloptool rd`
+      resets. rkdeveloptool cannot choose which device or which medium it writes.
+    support:
+      - class: doc
+        doc: radxa-docs-maskrom-linux
+        at: [{heading: Enter to Maskrom}]
+      - class: doc
+        doc: radxa-docs-rkdeveloptool
+        at:
+          - {heading: Using rkdeveloptool}
+          - {heading: Reboot}
+
+  - id: boot-storage
+    section: quick-facts
+    title: Boot storage
+    critical: true
+    claim: >-
+      Four boot media: a 16 MB SPI NOR flash (XT25F128B, 3.3 V) on the FSPI signals; an onboard
+      8-bit eMMC (BGA-153, HS400 with data strobe; 16 to 256 GB, or not fitted) on the eMMC
+      controller; a microSD slot on SDMMC0 with card detect; and two M.2 M-key slots with PCIe
+      3.0 x2 each for NVMe.
+    support:
+      - class: doc
+        doc: rock5t-schematic
+        at:
+          - {page: "21", heading: SPI/eMMC Flash}
+          - {page: "9", heading: RK3588_Flash/SD Controller}
+          - {page: "29", heading: Flash-TF Card/DMIC}
+          - {page: "24", heading: PCIE3.0 M key X2}
+      - class: doc
+        doc: rock5t-product-brief
+        at:
+          - {section: "3.1", page: "4"}
+          - {section: "3.2", page: "5"}
+          - {section: "7", page: "11"}
+
+  - id: nvme-needs-spi-loader
+    section: gotchas
+    title: NVMe boot needs the bootloader in SPI flash.
+    claim: >-
+      To boot from an NVMe SSD, Radxa's procedure first writes the SPI bootloader image to the
+      SPI flash (with `rsetup`, from a system booted off microSD), and that bootloader then loads
+      the system from NVMe. NVMe is not among the boot ROM's devices in the schematic's boot-mode
+      table (see the boot order strap).
+    support:
+      - class: doc
+        doc: radxa-docs-nvme
+        at:
+          - {heading: Overall Steps}
+          - {heading: Using System Tool rsetup to Flash SPI}
+    relates:
+      - {fact: "#boot-order-strap", relation: qualifies}
+
+  - id: ethernet
+    section: quick-facts
+    title: Ethernet
+    claim: >-
+      Two 2.5 GbE ports, each a Realtek RTL8125B on its own PCIe 2.0 x1 lane (`PCIE20_0` and
+      `PCIE20_2`). One port takes an optional PoE module.
+    support:
+      - class: doc
+        doc: rock5t-schematic
+        at:
+          - {page: "25", heading: PCIE TO RJ45_1}
+          - {page: "26", heading: PCIE TO RJ45_2}
+      - class: doc
+        doc: rock5t-product-brief
+        at: [{section: "6.2", page: "9"}]
+
+  - id: netboot-stock-loader
+    section: gotchas
+    title: Netboot with the stock loader is unconfirmed.
+    claim: >-
+      No document read here says whether the stock loader can bring up PCIe and drive the
+      RTL8125B to fetch a kernel over TFTP or PXE, or offers fastboot over USB or TCP.
+    todo:
+      check: hardware
+      text: >-
+        on the stock loader's console, list commands (help) and try `pci enum`, `dhcp` and `pxe
+        get` with a cable in each port.

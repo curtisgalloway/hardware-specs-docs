@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# Format 2 root marker for hardware-specs-docs (driver-lab, docs/SPEC-FORMAT-V2.md). A draft
+# root beside the format 1 root in specs/: a format 2 marker there would fail the format 1
+# bcm2711.spec.md, so format 2 drafts live here until the repository cuts over (SF2-11).
+# Documents only: no source tree is accepted.
+format: 2
+layer: public
+name: hardware-specs-docs
+license: CC-BY-4.0
+accepts: []

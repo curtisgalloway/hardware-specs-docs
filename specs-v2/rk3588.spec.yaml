@@ -1,0 +1,179 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+format: 2
+kind: soc
+id: rk3588
+name: Rockchip RK3588
+triggers: [rk3588, rockchip rk3588]
+not_triggers: [rk3588s, rk3576, rk3568]
+cache: rock5t-resources
+instances: []
+resources:
+  documents:
+    - name: gic600-trm
+      class: databook
+      title: Arm CoreLink GIC-600 Generic Interrupt Controller Technical Reference Manual
+      revision: "r1p6, 100336_0106_00_en"
+      url: https://developer.arm.com/documentation/100336/latest
+      retrieval:
+        - url: https://documentation-service.arm.com/static/5e7ddddacbfe76649ba53034
+          via: documentation-service
+      sha256: 500c1d7d733d576ca8de8c3bc4592bfcaf102267a5ddeff01d9e4ef997a7050f
+      pages: 216
+      page_numbering: printed
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+      note: "Marked Non-Confidential. Printed pages are chapter-numbered (4-103 is PDF page 103)."
+orientation: >-
+  The RK3588 is Rockchip's eight-core arm64 SoC. This documents-only base holds what public
+  documents state about it; no Rockchip reference manual is cited, so most SoC facts
+  here are gap facts, each naming a public source that could close it. The Linux, device-tree,
+  U-Boot and TF-A view, which answers most of them, is the GPL overlay in hardware-specs-gpl.
+  The board-level documents (schematic, product brief) are cited from the `rock5t` spec. The
+  RK3588S is a different package of the same die family and has its own spec id.
+facts:
+  - id: gic600-register-pages
+    section: quick-facts
+    title: GIC-600 register page layout
+    critical: true
+    claim: >-
+      In any GIC-600, the register map is a sequence of 64 KB pages from the GIC base: the
+      distributor (GICD) is page 0, the message-based-interrupt alias (GICA) page 1, trace and
+      debug page 2, PMU page 3; ITS n takes pages 4 + 2n (control) and 5 + 2n (translation);
+      redistributor n takes pages 4 + 2 × ITScount + 2n (LPI) and the page after (SGI and PPI),
+      with one redistributor per core; a GICD alias follows the last redistributor page. So with
+      k ITS blocks the redistributors start at `base + (4 + 2k) × 0x1_0000` at a 128 KB stride.
+    support:
+      - class: databook
+        doc: gic600-trm
+        at: [{section: "4.1.1", pages: ["4-103", "4-104"], table: "4-1"}]
+
+  - id: gic-instance
+    section: quick-facts
+    title: The RK3588's GIC instance
+    critical: true
+    claim: >-
+      The RK3588's GIC base address, GIC-600 revision, ITS count and redistributor count are not
+      stated by any public document read here.
+    todo:
+      check: document
+      text: >-
+        find them in Rockchip's public RK3588 datasheet, if its memory map lists the GIC; on a
+        board, read GICD_IIDR and GICD_TYPER at the base the GPL overlay gives, and GICR_TYPER of
+        each redistributor frame.
+
+  - id: gic-state-at-handoff
+    section: quick-facts
+    title: GIC security state left by firmware
+    claim: >-
+      No document read here says how the boot firmware leaves the GIC: the security
+      configuration (GICD_CTLR.DS), the group of each interrupt, or whether affinity routing is
+      enabled for the non-secure state.
+    todo:
+      check: hardware
+      text: at kernel entry, read GICD_CTLR and GICD_IGROUPR from non-secure EL2 or EL1.
+
+  - id: cpu-mpidr
+    section: quick-facts
+    title: MPIDR values per core
+    critical: true
+    claim: >-
+      The MPIDR_EL1 affinity value of each core, and so which core numbers are Cortex-A55 and
+      which Cortex-A76, is not stated by any public document read here.
+    todo:
+      check: document
+      text: >-
+        read MPIDR_EL1 (affinity fields and the MT bit) in Arm's Cortex-A55, Cortex-A76 and DSU
+        technical reference manuals; confirm the core order on a board by reading MPIDR_EL1 on
+        each core.
+
+  - id: system-counter
+    section: quick-facts
+    title: Generic timer frequency and interrupts
+    critical: true
+    claim: >-
+      The generic timer frequency (the value firmware should program in CNTFRQ_EL0) and the
+      timers' interrupt IDs and trigger types are not stated by any public document read here.
+    todo:
+      check: hardware
+      text: >-
+        read CNTFRQ_EL0 at kernel entry and time a known interval against CNTPCT_EL0; Rockchip's
+        public RK3588 datasheet may give the system counter clock.
+
+  - id: address-map
+    section: quick-facts
+    title: Address map
+    critical: true
+    claim: >-
+      The SoC's physical address map (where DRAM, the on-chip SRAM, the boot ROM and each
+      peripheral sit) is not stated by any public document read here.
+    todo:
+      check: document
+      text: >-
+        find the memory map in Rockchip's public RK3588 datasheet; failing that, the GPL overlay's
+        device-tree and U-Boot facts are the reference.
+
+  - id: interrupt-map
+    section: quick-facts
+    title: Interrupt map
+    critical: true
+    claim: >-
+      The interrupt ID and trigger type of each peripheral (UART2, the SD/MMC controllers, the
+      SPI flash controller) are not stated by any public document read here.
+    todo:
+      check: document
+      text: >-
+        find an interrupt table in Rockchip's public RK3588 datasheet; on a board, confirm UART2's
+        ID by enabling its THR-empty interrupt and reading GICD_ISPENDR.
+
+  - id: uart-programming-model
+    section: quick-facts
+    title: UART programming model
+    critical: true
+    claim: >-
+      The UART block's IP identity, register stride and width, FIFO depths and behavior on a line
+      control write during a transfer are not stated by any public document read here.
+    todo:
+      check: hardware
+      text: >-
+        on UART2, read the identification registers of the IP the GPL overlay's compatible
+        names, and fill the transmit FIFO while polling its level to measure the depth; a public
+        databook for that IP would close the rest.
+
+  - id: uart2-pinmux
+    section: quick-facts
+    title: UART2 pin multiplexing
+    critical: true
+    claim: >-
+      Which multiplexing registers and values select UART2's M0 function on its pins is not
+      stated by any public SoC document read here (the board spec gives the pin names from
+      Radxa's documents).
+    todo:
+      check: document
+      text: find the pin multiplexing table in Rockchip's public RK3588 datasheet.
+
+  - id: storage-controllers
+    section: quick-facts
+    title: Boot-storage controllers
+    critical: true
+    claim: >-
+      The base addresses, interrupts, clocks and programming models of the SD, eMMC and SPI flash
+      controllers are not stated by any public document read here.
+    todo:
+      check: document
+      text: >-
+        find them in Rockchip's public RK3588 datasheet; for the eMMC controller, the SD Host
+        Controller Standard Specification applies if the GPL overlay's SDHCI-compatible reading
+        holds.
+
+  - id: psci-not-documented
+    section: gotchas
+    title: The PSCI interface is not documented.
+    critical: true
+    claim: >-
+      Which PSCI version the boot firmware implements, and whether it is called with SMC or HVC,
+      is a property of the firmware, not the SoC, and no document read here states it.
+    todo:
+      check: hardware
+      text: call PSCI_VERSION with SMC from the kernel shim at EL2 and record the result.
