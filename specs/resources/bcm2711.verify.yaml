@@ -57,6 +57,11 @@ sources:
   commit: 439b6198a9b340de5998dd14a26a0d9d38a6bcac
   fetch: ok
   note: armstubs/Makefile lines 1, 26, 78, 97-98 checked for the TODO text.
+- name: rpi-docs-legacy-config-txt
+  commit: 42deaefbc8b4edfe342b0d759ec16cda3be5e7d8
+  fetch: ok
+  note: legacy_config_txt/boot.adoc read at the pinned commit via raw fetch (4151 bytes); also config_txt/boot.adoc
+    at the same commit, which has no arm_peri_high text.
 summary:
   pass: 35
   fail: 0
@@ -780,38 +785,41 @@ verdicts:
     contrary_evidence: none-found
     citation_precision: exact
   peripheral-mode-selection:
-    basis: 0deb0c475e8e8e52b466d59aee2512f3a9260883c319bd2aad6d94447f4f607a
+    basis: d350a5b6a0bd3372e0ba6b4095e3a99d96f3d4b8cb090a5d2a4f36478475ce36
     verdict: PASS
     date: '2026-10-09'
-    verifier: Claude Code, claude-sonnet-5-5, reader bcm2711-sf2-10b-r2-primary
-    note: 'Read the arm_peri_high entry of legacy_config_txt/boot.adoc at raspberrypi/documentation
-      42deaefb: it says arm_peri_high=1 enables high peripheral mode on Raspberry Pi 4, that it is
-      set automatically if a suitable DTB is loaded, that enabling it without a compatible Device
-      Tree fails to boot, and the quoted "Currently ARM stub support is missing" sentence verbatim.
-      The commit date 2026-10-06 matches the GitHub commit record. The claim is scoped to that snapshot
-      and does not assert current firmware behavior. The TODO is a feasible hardware observation;
-      its cited raspberrypi/tools armstubs/Makefile lines (1, 26, 78, 97-98 at 439b6198) check out
-      (armstub8-gic-highperi.bin built with -DHIGH_PERI, packed as armstub8_gic_highperi[]). Searched
-      the config.txt boot page, the boot-folder page and the other fetched pages for any other arm_peri_high
-      text; only this entry exists.'
+    verifier: Claude Code, claude-sonnet-5-5, reader bcm2711-sf2-11-primary
+    note: 'raspberrypi/documentation at 42deaefb, documentation/asciidoc/computers/legacy_config_txt/boot.adoc
+      lines 32-36, heading arm_peri_high: "Set arm_peri_high to 1 to enable high peripheral mode on
+      Raspberry Pi 4. It is set automatically if a suitable DTB is loaded."; the NOTE says enabling
+      it without a compatible Device Tree makes the system fail to boot and "Currently ARM stub support
+      is missing, so you will also need to load a suitable file using armstub". Each clause of the
+      claim matches, including the snapshot-dated hedge on the stub sentence and the disclaimer about
+      current firmware. Searched the whole legacy page and the non-legacy config_txt/boot.adoc at
+      the same commit for other arm_peri_high text or a qualification; the non-legacy page has no
+      mention. The TODO (boot with no armstub= line) is a feasible hardware check and does not weaken
+      the supported documentation reading.'
     contrary_evidence: none-found
     citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-r2-second
+    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-11-second
       verdict: PASS
       date: '2026-10-09'
-      note: 'Read legacy_config_txt/boot.adoc at raspberrypi/documentation 42deaefb, heading arm_peri_high:
-        "Set arm_peri_high to 1 to enable high peripheral mode on Raspberry Pi 4. It is set automatically
-        if a suitable DTB is loaded", and the NOTE that enabling it without a compatible Device Tree
-        makes the system fail to boot and "Currently ARM stub support is missing, so you will also
-        need to load a suitable file using armstub". The quotation is verbatim; the commit date 2026-10-06
-        matches the GitHub commit record; the claim keeps the statement attributed and does not assert
-        it for current firmware. Contrary search: the other pinned pages (config_txt/boot.adoc armstub,
-        interfaces.adoc, reference.adoc) say nothing about high peripheral mode; the pinned raspberrypi/tools
-        armstubs/Makefile builds armstub8-gic-highperi.bin and packs it into armstubs.h, which the
-        TODO already reports and the claim does not contradict. TODO method (boot with arm_peri_high=1
-        and no armstub=) can observe the open question. Minor TODO-text precision: the -DHIGH_PERI
-        flag is on Makefile line 27, line 26 is the rule header. Citation exact.'
+      note: 'Read raspberrypi/documentation at commit 42deaefb (committer date 2026-10-06T12:06:10Z,
+        matching the claim), documentation/asciidoc/computers/legacy_config_txt/boot.adoc, section
+        "arm_peri_high" (lines 32-36). Line 34 says setting arm_peri_high to 1 enables high peripheral
+        mode on Raspberry Pi 4 and that it is set automatically if a suitable DTB is loaded; the NOTE
+        on line 36 says enabling it without a compatible Device Tree makes the system fail to boot
+        and quotes "Currently ARM stub support is missing, so you will also need to load a suitable
+        file using `armstub`" verbatim as the claim gives it. The claim''s hedges (documentation says;
+        snapshot-scoped; no assertion about current firmware) match the evidence. Citation precision
+        exact: the heading locates the whole claim. Contrary evidence searched: the current (non-legacy)
+        config_txt/boot.adoc at the same commit does not mention arm_peri_high at all, and its armstub
+        section says the default stub is selected automatically by model and settings; neither contradicts
+        the claim, but the option now lives only under "Legacy boot options", which the claim could
+        name (optional wording, not a discrepancy). No contrary evidence found. The hardware TODO
+        (boot with arm_peri_high=1 and no armstub line, check peripherals at high addresses) can observe
+        the open question.'
   high-peripheral-mode-is-full-map:
     basis: fc5d2bab90baa2ccdc92413eb8ed42bb161c1af04ee261061e9213ae25279609
     verdict: PASS

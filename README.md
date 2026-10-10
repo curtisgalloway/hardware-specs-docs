@@ -127,6 +127,8 @@ Exit codes: 0 passed, 1 a check failed, 2 usage error, 3 missing precondition.
 
 Check out the driver-lab commit that `.github/workflows/checks.yml` pins for an identical run.
 
+The driver-lab pins (`TOOL_COMMIT` and the driver-lab checkout in `checks.yml` and `publish.yml`) should be bumped dependents-first or together: a repository that other spec repositories read as a context root must not move to a newer driver-lab than the repositories reading it, or those repositories may reject it.
+
 ## License
 
 The specs, their verification records and documentation are licensed CC-BY-4.0

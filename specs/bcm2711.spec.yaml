@@ -245,12 +245,9 @@ facts:
   todo:
     check: hardware
     text: |-
-      whether current firmware's built-in stub supports high peripheral mode. The pinned
-      raspberrypi/tools `armstubs/Makefile` (commit `439b6198`, lines 1 and 26) builds
-      `armstub8-gic-highperi.bin` with `-DHIGH_PERI` and packs it into `armstubs.h` as
-      `armstub8_gic_highperi[]` (lines 78, 97-98), so a high-peripheral stub exists beside the
-      others; whether the firmware selects it is not established. Boot with `arm_peri_high=1` and
-      no `armstub=` line and observe.
+      whether current firmware's built-in stub supports high peripheral mode. Boot with
+      `arm_peri_high=1` and no `armstub=` line and observe whether the system boots and the
+      peripherals respond at their high-peripheral addresses.
 - id: high-peripheral-mode-is-full-map
   critical: true
   section: quick-facts
