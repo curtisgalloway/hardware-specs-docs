@@ -59,9 +59,10 @@ facts:
     todo:
       check: document
       text: >-
-        find them in Rockchip's public RK3588 datasheet, if its memory map lists the GIC; on a
-        board, read GICD_IIDR and GICD_TYPER at the base the GPL overlay gives, and GICR_TYPER of
-        each redistributor frame.
+        find them in Rockchip's RK3588 datasheet, only if Rockchip publishes it without a
+        confidential or NDA marking and its memory map lists the GIC; otherwise the base comes
+        from the GPL overlay. On a board, read GICD_IIDR and GICD_TYPER at the base the GPL
+        overlay gives, and GICR_TYPER of each redistributor frame.
 
   - id: gic-state-at-handoff
     section: quick-facts
@@ -72,7 +73,12 @@ facts:
       enabled for the non-secure state.
     todo:
       check: hardware
-      text: at kernel entry, read GICD_CTLR and GICD_IGROUPR from non-secure EL2 or EL1.
+      text: >-
+        at kernel entry, read GICD_CTLR from non-secure EL2 or EL1 for DS and ARE_NS. This
+        settles those two bits only. The group of each interrupt is not observable from the
+        non-secure side when DS is 0, because the non-secure view of GICD_IGROUPR does not show
+        secure-configured interrupts; it needs DS = 1 or a secure-side read, and until one is
+        done the per-interrupt groups stay unknown.
 
   - id: cpu-mpidr
     section: quick-facts
@@ -82,11 +88,13 @@ facts:
       The MPIDR_EL1 affinity value of each core, and so which core numbers are Cortex-A55 and
       which Cortex-A76, is not stated by any public document read here.
     todo:
-      check: document
+      check: hardware
       text: >-
-        read MPIDR_EL1 (affinity fields and the MT bit) in Arm's Cortex-A55, Cortex-A76 and DSU
-        technical reference manuals; confirm the core order on a board by reading MPIDR_EL1 on
-        each core.
+        read MPIDR_EL1 on each core of a booted board and record the affinity fields and the MT
+        bit. Arm's Cortex-A55, Cortex-A76 and DSU technical reference manuals only decode the
+        register's field layout; the affinity values are set by the SoC integrator, so no Arm
+        manual states which RK3588 core number is an A55 or an A76. The GPL overlay's device-tree
+        and TF-A facts give the expected values to compare.
 
   - id: system-counter
     section: quick-facts
@@ -98,8 +106,15 @@ facts:
     todo:
       check: hardware
       text: >-
-        read CNTFRQ_EL0 at kernel entry and time a known interval against CNTPCT_EL0; Rockchip's
-        public RK3588 datasheet may give the system counter clock.
+        read CNTFRQ_EL0 at kernel entry; that reports only what firmware already programmed, not
+        what firmware should program. To check that the counter actually runs at that rate, time
+        a known interval against CNTPCT_EL0 using an independent reference clock outside the SoC
+        (for example a logic analyzer on a pin toggled by the code, or the host's clock over a
+        timestamped serial line). For the interrupt IDs and trigger types, read the PPI
+        configuration in GICR_ICFGR0/1 of each redistributor's SGI frame and compare with the
+        PPI assignment the Arm Base System Architecture and GIC architecture recommend. Rockchip's
+        RK3588 datasheet may give the system counter clock, if published without a confidential
+        or NDA marking.
 
   - id: address-map
     section: quick-facts
@@ -111,8 +126,11 @@ facts:
     todo:
       check: document
       text: >-
-        find the memory map in Rockchip's public RK3588 datasheet; failing that, the GPL overlay's
-        device-tree and U-Boot facts are the reference.
+        find the memory map in Rockchip's RK3588 datasheet, only if Rockchip publishes it without
+        a confidential or NDA marking, and note whether it lists the full peripheral map or only
+        the main blocks (the Rockchip technical reference manual, which holds the full map, is
+        not public). Failing that, the GPL overlay's device-tree and U-Boot facts are the
+        reference.
 
   - id: interrupt-map
     section: quick-facts
@@ -124,8 +142,12 @@ facts:
     todo:
       check: document
       text: >-
-        find an interrupt table in Rockchip's public RK3588 datasheet; on a board, confirm UART2's
-        ID by enabling its THR-empty interrupt and reading GICD_ISPENDR.
+        find an interrupt table in Rockchip's RK3588 datasheet, only if it is published without a
+        confidential or NDA marking and has one. On a board, for each of UART2, the SD/MMC
+        controllers and the SPI flash controller: provoke an interrupt (for UART2, enable the
+        THR-empty interrupt; for the others, start a controller operation with its interrupt
+        enabled and masked at the GIC), read GICD_ISPENDR to find the ID (SPI n is bit n), and read
+        GICD_ICFGR for the trigger type. Any controller not exercised this way stays unknown.
 
   - id: uart-programming-model
     section: quick-facts
@@ -137,9 +159,12 @@ facts:
     todo:
       check: hardware
       text: >-
-        on UART2, read the identification registers of the IP the GPL overlay's compatible
-        names, and fill the transmit FIFO while polling its level to measure the depth; a public
-        databook for that IP would close the rest.
+        on UART2, read the identification registers (component version and parameter registers)
+        of the IP the GPL overlay's compatible names; measure the FIFO depth by filling the
+        transmit FIFO with the transmitter held off and counting accepted bytes, since a FIFO
+        level register exists only if that feature was configured in the IP; find the register
+        stride and width by access experiments. This cannot observe the behavior of a line
+        control write during a transfer; a public databook for that IP would close that part.
 
   - id: uart2-pinmux
     section: quick-facts
@@ -151,7 +176,11 @@ facts:
       Radxa's documents).
     todo:
       check: document
-      text: find the pin multiplexing table in Rockchip's public RK3588 datasheet.
+      text: >-
+        find the pin multiplexing table in Rockchip's RK3588 datasheet, only if it is published
+        without a confidential or NDA marking. A datasheet gives the function name of each pin,
+        not the register fields and values; those need the GPL overlay's source facts or a
+        hardware probe that reads the IOC registers on a board where the console works.
 
   - id: storage-controllers
     section: quick-facts
@@ -163,9 +192,13 @@ facts:
     todo:
       check: document
       text: >-
-        find them in Rockchip's public RK3588 datasheet; for the eMMC controller, the SD Host
-        Controller Standard Specification applies if the GPL overlay's SDHCI-compatible reading
-        holds.
+        base addresses and interrupts: Rockchip's RK3588 datasheet memory and interrupt tables,
+        only if published without a confidential or NDA marking, otherwise the GPL overlay. Clocks
+        and programming models need a source per controller: the SD Host Controller Standard
+        Specification applies only to the eMMC controller, and only if the GPL overlay's
+        SDHCI-compatible reading holds; the SD controller (a DesignWare MMC variant) and the SPI
+        flash controller are not covered by that standard and need their own IP documentation
+        or the GPL overlay's source.
 
   - id: psci-not-documented
     section: gotchas
@@ -176,4 +209,8 @@ facts:
       is a property of the firmware, not the SoC, and no document read here states it.
     todo:
       check: hardware
-      text: call PSCI_VERSION with SMC from the kernel shim at EL2 and record the result.
+      text: >-
+        call PSCI_VERSION with SMC from the kernel shim at EL2 and record the result; that
+        settles the version and that the SMC conduit works, not that HVC is refused. To settle the
+        conduit, also call PSCI_FEATURES and attempt PSCI_VERSION with HVC from EL1, and read the
+        method property of the device tree the firmware passes.

@@ -72,6 +72,15 @@ resources:
       access: public
       verified: 2026-10-09
       fetch: ok
+    - name: radxa-docs-rock5t-uboot
+      class: doc
+      title: Radxa documentation, ROCK 5T U-Boot development (wrapper page, rock5/rock5t/low-level-dev/u-boot.md)
+      url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/rock5/rock5t/low-level-dev/u-boot.md
+      commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+      access: public
+      verified: 2026-10-09
+      fetch: ok
+      note: Includes the shared U-Boot page with model, profile and product properties.
     - name: radxa-docs-nvme
       class: doc
       title: Radxa documentation, installing the system to NVMe (shared page used by the ROCK 5T docs)
@@ -111,6 +120,14 @@ orientation: >-
   ROM's boot order, and Maskrom recovery. It rests only on Radxa's and U-Boot's documents and
   the Linux boot protocol; the Linux, device-tree and U-Boot source view is the GPL overlay in
   hardware-specs-gpl. The schematic read is V1.2; the ROCK 5T Industrial (V2.01) is not covered.
+assumptions:
+  - id: shipped-loader-is-bsp-build
+    text: >-
+      the loader on a factory-flashed ROCK 5T is the U-Boot Radxa's BSP tool builds for the
+      `rock-5t` product, not a different build
+    todo:
+      check: hardware
+      text: read the version banner the loader prints on the console of a factory-flashed board.
 facts:
   - id: cpu-complex
     section: quick-facts
@@ -173,32 +190,66 @@ facts:
       text: >-
         at kernel entry, write a byte to UART2's transmit register without other setup and watch
         the header; then read back the pin multiplexing and divisor registers the GPL overlay
-        names.
+        names. Run the byte test twice, once under the stock loader and once under mainline
+        U-Boot, because the claim is about the stock firmware and the state differs between them.
     relates:
       - {fact: "rk3588#uart2-pinmux", relation: qualifies}
 
   - id: stock-loader
     section: quick-facts
-    title: The stock loader is Radxa's vendor U-Boot
+    title: Radxa's BSP builds the ROCK 5T U-Boot from the rk2410 profile
     critical: true
     claim: >-
-      Radxa builds the ROCK 5T's U-Boot from its BSP tool with the `rk2410` profile, the same as
-      the ROCK 5B; the profile produces packages named `u-boot-rk2410_2017.09-…`, a U-Boot 2017.09
-      base, not mainline U-Boot.
+      Radxa's shared U-Boot page lists `rock-5t` with the `rk2410` profile, as it does `rock-5b`;
+      its worked example, for the ROCK 5B, builds a package named
+      `u-boot-rk2410_2017.09-999_arm64.deb`. The ROCK 5T wrapper page passes the profile
+      `rknext` to that shared page, which does not read the property; Radxa's pages do not
+      explain the difference.
     support:
       - class: doc
         doc: radxa-docs-uboot
         at: [{heading: Build U-Boot}]
+      - class: doc
+        doc: radxa-docs-rock5t-uboot
+        at: [{heading: U-boot Development}]
+    todo:
+      check: hardware
+      text: read the version banner on the console of a factory-flashed board.
+
+  - id: stock-loader-is-2017-vendor-build
+    section: quick-facts
+    title: The stock loader is a 2017.09-based vendor U-Boot
+    critical: true
+    claim: >-
+      The loader on a factory-flashed ROCK 5T is a vendor U-Boot with a 2017.09 base, not
+      mainline U-Boot.
+    support:
+      - class: inference
+        confidence: medium
+        premises:
+          - fact: "#stock-loader"
+            uses: the rock-5t row's rk2410 profile and the 2017.09 package name
+          - assumption: shipped-loader-is-bsp-build
+        derivation: >-
+          the rk2410 profile builds a package whose version field is 2017.09, which names the
+          U-Boot base version; if the shipped loader is that build, it has a 2017.09 base and is
+          therefore not mainline. The wrapper's unexplained `rknext` profile weakens the
+          premise.
+    todo:
+      check: hardware
+      text: read the version banner on the console of a factory-flashed board.
+    assumes: [shipped-loader-is-bsp-build]
 
   - id: mainline-boot-chain
     section: quick-facts
     title: Mainline boot chain
     claim: >-
       Mainline U-Boot supports the ROCK 5T through the `rock5b-rk3588` configuration (it lists
-      "Radxa ROCK 5B/5B+/5T"). An arm64 Rockchip image needs TF-A's BL31; where U-Boot cannot
+      "Radxa ROCK 5B/5B+/5T"). An arm64 Rockchip image needs a BL31 (built from TF-A or, in the page's rk3588 example,
+      Rockchip's `rkbin` binary); where U-Boot cannot
       initialize DRAM, Rockchip's DDR binary from `rkbin` is packaged as the TPL. The single
-      `u-boot-rockchip.bin` image (TPL, SPL, then U-Boot proper with BL31) is written at sector 64
-      of an SD card, and `u-boot-rockchip-spi.bin` at offset 0 of SPI flash.
+      `u-boot-rockchip.bin` image is written at sector 64 of an SD card, and
+      `u-boot-rockchip-spi.bin` at offset 0 of SPI flash.
     support:
       - class: doc
         doc: uboot-docs-rockchip
@@ -206,10 +257,11 @@ facts:
           - {heading: Rockchip boards}
           - {heading: TF-A}
           - {heading: TPL}
+          - {heading: U-Boot}
           - {heading: Package the image with U-Boot TPL/SPL}
     todo:
       check: source
-      text: the order TPL, SPL, BL31, U-Boot proper is read from U-Boot's packaging; confirm it on the console of a mainline boot.
+      text: the contents of `u-boot-rockchip.bin` and the order its stages run are not stated by the page; confirm which stages run and in what order on the console of a mainline boot.
 
   - id: kernel-entry-contract
     section: quick-facts
@@ -280,7 +332,9 @@ facts:
       check: hardware
       text: >-
         dump the memory node and reserved-memory and memreserve entries of the device tree the
-        stock loader passes, for each RAM size available.
+        stock loader passes, for each RAM size available. This settles which ranges are declared
+        reserved; it cannot show what BL31 or OP-TEE write outside their reservations, which needs
+        the firmware's own documentation or source, so that clause of the claim stays unknown.
     relates:
       - {fact: "rk3588#address-map", relation: qualifies}
 
@@ -338,10 +392,12 @@ facts:
     title: Boot storage
     critical: true
     claim: >-
-      Four boot media: a 16 MB SPI NOR flash (XT25F128B, 3.3 V) on the FSPI signals; an onboard
-      8-bit eMMC (BGA-153, HS400 with data strobe; 16 to 256 GB, or not fitted) on the eMMC
-      controller; a microSD slot on SDMMC0 with card detect; and two M.2 M-key slots with PCIe
-      3.0 x2 each for NVMe.
+      Four storage media, of which the boot ROM reads three (see `#boot-order-strap`): an SPI NOR
+      flash (part XT25F128B, 3.3 V) on the FSPI signals; an onboard 8-bit eMMC (BGA-153, with a
+      data strobe wired; 16 to 256 GB in the product brief's section 3.1, whose section 7 order
+      codes list E0, not fitted, to E128) on the eMMC controller; a microSD slot on SDMMC0 with
+      card detect; and two M.2 M-key slots with PCIe 3.0 x2 each for NVMe, which the ROM does not
+      read.
     support:
       - class: doc
         doc: rock5t-schematic
@@ -356,6 +412,9 @@ facts:
           - {section: "3.1", page: "4"}
           - {section: "3.2", page: "5"}
           - {section: "7", page: "11"}
+    todo:
+      check: document
+      text: the SPI flash's capacity and the eMMC bus mode (HS400) are not stated by the schematic or brief pages cited; take them from the XTX part's datasheet and the brief's block diagram (schematic sheet 3), or read the JEDEC ID and the eMMC bus speed mode on a board.
 
   - id: nvme-needs-spi-loader
     section: gotchas
@@ -400,4 +459,7 @@ facts:
       check: hardware
       text: >-
         on the stock loader's console, list commands (help) and try `pci enum`, `dhcp` and `pxe
-        get` with a cable in each port.
+        get` with a cable in each port. The command listing only shows whether a fastboot command
+        exists, not that it works: to settle fastboot, run it over USB and over TCP. The stock
+        loader is a 2017.09-based build and may name its commands differently, so read its help
+        output rather than assuming mainline names.
