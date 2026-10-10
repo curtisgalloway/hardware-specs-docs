@@ -21,7 +21,7 @@ resources:
     access: public
     verified: '2026-10-07'
     fetch: ok
-    note: 166-page PDF, ; also served at https://pip.raspberrypi.com/documents/RP-008248-DS. Page numbers in this spec are the printed page numbers (the PDF page is one higher).
+    note: 166-page PDF, SHA-256 d6e16ea089a1716e80621f99a26e130a2379f0a81d945dc22e4f80dc49dcdc78; also served at https://pip.raspberrypi.com/documents/RP-008248-DS. Page numbers in this spec are the printed page numbers (the PDF page is one higher).
     name: bcm2711-peripherals
     class: databook
     sha256: d6e16ea089a1716e80621f99a26e130a2379f0a81d945dc22e4f80dc49dcdc78
@@ -131,7 +131,7 @@ resources:
     access: public
     verified: '2026-10-08'
     fetch: ok
-    note: read at wiki commit c9e615a74d377a7e94ac2140336d1352941ef9a2; the page is marked as a draft, and only its "Addresses as data" section is cited (its example base address and cache code are for older chips)
+    note: read at wiki commit c9e615a74d377a7e94ac2140336d1352941ef9a2; the page is marked as a draft, and only its "General procedure" and "Addresses as data" sections are cited (its example base address and cache code are for older chips)
     name: rpi-wiki-accessing-mailboxes
     class: doc
     retrieval:
@@ -231,14 +231,26 @@ facts:
   title: Peripheral mode selection
   claim: |-
     `arm_peri_high=1` in `config.txt` selects high peripheral mode,
-    and the firmware also selects it on its own when it loads a device tree that suits it. Turning
-    it on without a matching device tree stops the board booting, and the stub the firmware
-    supplies does not support it, so an `armstub` of your own is needed.
+    and the documentation says the firmware also sets it automatically when a suitable device tree
+    is loaded. The documentation says that enabling it without a compatible device tree makes the
+    system fail to boot. As of the documentation snapshot read (raspberrypi/documentation commit
+    `42deaefb`, committed 2026-10-06) it also says "Currently ARM stub support is missing, so you
+    will also need to load a suitable file using `armstub`"; the page is not dated beyond that
+    snapshot, and this spec does not assert that the statement still holds for current firmware.
   support:
   - class: doc
     doc: rpi-docs-legacy-config-txt
     at:
     - heading: arm_peri_high
+  todo:
+    check: hardware
+    text: |-
+      whether current firmware's built-in stub supports high peripheral mode. The pinned
+      raspberrypi/tools `armstubs/Makefile` (commit `439b6198`, lines 1 and 26) builds
+      `armstub8-gic-highperi.bin` with `-DHIGH_PERI` and packs it into `armstubs.h` as
+      `armstub8_gic_highperi[]` (lines 78, 97-98), so a high-peripheral stub exists beside the
+      others; whether the firmware selects it is not established. Boot with `arm_peri_high=1` and
+      no `armstub=` line and observe.
 - id: high-peripheral-mode-is-full-map
   critical: true
   section: quick-facts
@@ -253,6 +265,17 @@ facts:
         doc: rpi-docs-legacy-config-txt
         at:
         - heading: arm_peri_high
+    - states: the default configuration runs in Low Peripheral mode, since the documented early console for Raspberry Pi 4 uses UART0's Low Peripheral address, `0xfe201000`
+      support:
+      - class: doc
+        doc: rpi-docs-uarts
+        at:
+        - heading: Enable early console for Linux
+      - class: databook
+        doc: bcm2711-peripherals
+        at:
+        - section: 1.2.4
+          page: '6'
     - states: the datasheet gives the Arm cores only two views, the full 35-bit map and Low Peripheral mode
       support:
       - class: databook
@@ -262,7 +285,7 @@ facts:
           page: '4'
         - section: 1.2.3
           page: '6'
-    derivation: if high peripheral mode is not Low Peripheral mode, it is the full map; neither source uses both names
+    derivation: high peripheral mode is the alternative to the default, and the default is Low Peripheral mode, so high peripheral mode is not Low Peripheral mode; the Arm cores have only two views, so it is the full map; neither source uses both names
   todo:
     check: hardware
     text: |-
@@ -296,9 +319,10 @@ facts:
       heading: /reserved-memory
     - section: '5.3'
       heading: Memory Reservation Block
-  todo:
-    check: document
-    text: 'citation-pass: v1 also cites the Raspberry Pi documentation BCM2711 processor page with no section or heading, so no locator can be structured for it yet.'
+  - class: doc
+    doc: rpi-docs-bcm2711
+    at:
+    - heading: BCM2711
 - id: dma-view-of-memory
   section: quick-facts
   title: DMA view of memory
@@ -352,9 +376,12 @@ facts:
     doc: rpi-docs-boot-folder
     at:
     - heading: Device Trees, overlays, and parameters
-  todo:
-    check: document
-    text: 'citation-pass: v1 also cites the Raspberry Pi documentation EEPROM boot flow (no section or heading) and "boot folder contents" (not a quoted heading), so no locator can be structured for those yet.'
+    - heading: start*.elf
+  - class: doc
+    doc: rpi-docs-eeprom-boot-flow
+    at:
+    - heading: First stage bootloader
+    - heading: Second stage bootloader
 - id: stub-load-and-hand-off-words
   critical: true
   section: quick-facts
@@ -406,14 +433,21 @@ facts:
   section: quick-facts
   title: PSCI through TF-A
   claim: |-
-    No document describes PSCI for the stock stub. Trusted Firmware-A has a
+    This spec cites no document describing PSCI for the stock stub. Trusted Firmware-A has a
     BL31-only port (`PLAT=rpi4`) loaded through `armstub=`: it enters the payload at AArch64 EL2
     with the device-tree address in `x0`, and patches the device tree to advertise PSCI and to
     reserve its own resident memory. The port's documentation warns it is not secure, since all its
     memory is DRAM the non-secure world can reach.
+  support:
+  - class: doc
+    doc: tfa-rpi4
+    at:
+    - heading: Build Instructions
+    - heading: TF-A port design
+    note: the not-secure warning and the statement that the port loads non-secure EL2 payloads are in the introduction under the page title "Raspberry Pi 4", which has no heading of its own
   todo:
     check: document
-    text: 'citation-pass: v1 cites only the Trusted Firmware-A documentation, Raspberry Pi 4 platform, as a whole with no section or heading, so no locator can be structured yet.'
+    text: whether any Raspberry Pi document describes PSCI for the stock stub; a fetch cannot settle a negative.
 - id: smp-topology
   section: quick-facts
   title: SMP topology
@@ -439,13 +473,15 @@ facts:
       page: 4-208
     - section: '5.5'
       page: 5-281
+  - class: doc
+    doc: rpi-docs-bcm2711
+    at:
+    - heading: BCM2711
   todo:
     check: hardware
     text: |-
       the
       cluster-ID wiring, which no document gives; read MPIDR_EL1 on each core.
-
-      citation-pass: v1 also cites the Raspberry Pi documentation BCM2711 processor page with no section or heading, so no locator can be structured for it yet.
 - id: secondary-core-release-linux-s-protocol
   section: quick-facts
   title: Secondary-core release (Linux's protocol)
@@ -461,8 +497,7 @@ facts:
   - class: standard
     doc: linux-arm64-booting
     at:
-    - heading: CPU enable methods
-    - heading: Secondary CPU general-purpose register settings
+    - heading: 4. Call the kernel image
   todo:
     check: hardware
     text: |-
@@ -648,6 +683,8 @@ facts:
     - heading: Primary and secondary UARTs
     - heading: Mini UART and core frequency
     - heading: Enable additional UARTs on Raspberry Pi 4, 400, CM4, and CM4S
+    - heading: Disable Bluetooth and make UART0 primary
+    - heading: Switch Bluetooth to use mini UART and make UART0 primary
   - class: doc
     doc: rpi-docs-config-txt
     at:
@@ -658,8 +695,6 @@ facts:
       which UARTs CM4 and CM4S enable by default, and the
       primary and secondary UART assignment on Raspberry Pi 400 and Compute Module 4S, which the
       documentation does not settle.
-
-      citation-pass: v1 also cites "the Bluetooth overlay sections" of the UARTs page without naming a heading, so no locator can be structured for them yet.
 - id: early-console
   critical: true
   section: quick-facts
@@ -837,10 +872,11 @@ facts:
   - class: doc
     doc: rpi-wiki-mailbox-property-interface
     at:
-    - heading: opening sections
+    - section: preamble before Tags (ARM to VC)
   - class: doc
     doc: rpi-wiki-accessing-mailboxes
     at:
+    - heading: General procedure
     - heading: Addresses as data
   todo:
     check: hardware
@@ -859,7 +895,11 @@ facts:
       - class: doc
         doc: rpi-wiki-mailbox-property-interface
         at:
-        - heading: opening sections
+        - section: preamble before Tags (ARM to VC)
+      - class: doc
+        doc: rpi-wiki-mailboxes
+        at:
+        - heading: Overview
     derivation: 28 bits of address above a 4-bit alignment reach only the first 4 GB; the firmware may impose tighter limits that no document states
   todo:
     check: hardware
@@ -1023,12 +1063,16 @@ facts:
   section: gotchas
   title: Not the Pi 5 chip
   claim: |-
-    The Raspberry Pi 5 family uses the BCM2712, its successor; do not assume
-    any address, interrupt number or boot detail here holds for it, and use a `bcm2712` spec
-    instead.
-  todo:
-    check: document
-    text: 'citation-pass: v1 cites only the Raspberry Pi documentation BCM2712 processor page as a whole with no section or heading, so no locator can be structured yet.'
+    The Raspberry Pi 5 family (Raspberry Pi 5, 500, 500+ and Compute Module 5) uses the
+    BCM2712, the successor to the BCM2711. The documentation says it shares many common
+    architectural features with other BCM27xx devices; it does not say that this chip's addresses,
+    interrupt numbers or boot details carry over, and none of them are claimed here for the
+    BCM2712.
+  support:
+  - class: doc
+    doc: rpi-docs-bcm2712
+    at:
+    - heading: BCM2712
 orientation: |-
   The BCM2711 is the SoC of the Raspberry Pi 4 Model B, the Raspberry Pi 400 and Compute Modules 4
   and 4S: four 64-bit Cortex-A72 cores beside a VideoCore VI GPU. The VideoCore and its firmware
