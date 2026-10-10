@@ -5,7 +5,7 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # hardware-specs-docs
 
-Hardware specs built only from public datasheets, technical reference manuals (TRMs) and
+Hardware specs, built only from public datasheets, technical reference manuals (TRMs) and
 standards, licensed CC-BY-4.0. No spec here cites source code, so you may use them whatever your
 own project's license is, with attribution. Each spec lists its documents with a URL and a
 SHA-256 hash and cites them by name and page.
