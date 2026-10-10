@@ -1,0 +1,496 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+format: 2
+spec: bcm2711
+spec_file: bcm2711.spec.yaml
+spec_sha256: ef77bf181ff7223e55a4cc8368b5fab70e0864055325d172ce7a8bb0db3d1feb
+canonical: fact-v1
+sources: []
+summary:
+  pass: 24
+  fail: 0
+  unverifiable: 0
+  gap: 0
+  adjudicate: 0
+verdicts:
+  addressing-model:
+    basis: bdb6cd64a8704e9266c360b47346c7b32b863049a2008ccc0204013123814bb9
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: '35-bit and legacy views, full-map Main and ARM Local
+
+      ranges, Low Peripheral ranges, the 0x7Enn→0x4_7Enn/0x0_FEnn translation and UART0 at legacy
+
+      0x7E20_1000 match §1.2.1–1.2.4 (pp. 4–6) and §11.5 (pp. 146–147). The GIC and ARM_LOCAL exceptions
+
+      match §6.5.1–6.5.2 (p. 92).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/1 "Addressing model"
+      format: 1
+  dma-view-of-memory:
+    basis: 29fa21399883ab4175a334a830594aac519a8f69f57c5a501ad8cb48bd328df1
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'legacy RAM window 0xC000_0000–0xFFFF_FFFF, movable
+
+      with PAGE/PAGELITE, fixed L2 aliases at 0x0 and 0x8000_0000 limited to the first 1 GB, and
+
+      peripherals at 0x7C00_0000–0x7FFF_FFFF (§1.2.4, p. 6). ENABLE.PAGE 27:24 (DMA0–6) and PAGELITE
+
+      31:28 (DMA7–10) (Table 62, p. 60). DMA4 bypasses paging (§4.6, p. 64). Channel 15 at 0x7EE0_5000,
+
+      VPU-only (§4.2, p. 31).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/4 "DMA view of memory"
+      format: 1
+  stub-load-and-hand-off-words:
+    basis: 7c849b6f710f2e0c4e72f86c1e60e925a23b24689c489eb61be8c659e71a6ff3
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'load to address 0, AArch64 EL3, magic value
+
+      causing the kernel and DTB load addresses to be written near the start of memory: TF-A rpi4.rst
+
+      "TF-A port design".'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/6 "Stub load and hand-off words"
+      format: 1
+  kernel-entry-contract-linux-s-requirements:
+    basis: 68c6ee69f5d119e75617002adeb3ef54f3799da2edd4f4f9cb2e210e5473c88d
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'x0–x3, DAIF, MMU off, NS
+
+      EL2/EL1, CNTFRQ/CNTVOFF, EL1PCTEN, DTB alignment and size, text_offset/image_size placement,
+      DMA
+
+      quiesce, PoC clean, coherency, same EL, SCR_EL3.FIQ and HCE all match booting.rst "Setup the
+
+      device tree" and "Call the kernel image". booting.rst adds "where available" to EL1PCTEN, which
+
+      changes nothing on a core that implements EL2.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/7 "Kernel entry contract (Linux's requirements)"
+      format: 1
+  interrupt-controller:
+    basis: da13d9e1480cea6996f3ffa5ac96d99efc469735ab49fc2b5bf831493d820c48
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'GIC-400 selected by default and the legacy
+
+      controller selectable from config.txt (§6.1, p. 85; §6.3, p. 89; `enable_gic` on the legacy
+
+      boot options page, default 1). Base 0x4_C004_0000 / 0xFF84_0000 and NUM_CPUS=4, NUM_SPIS=192
+
+      (§6.5.1, p. 92). Distributor +0x1000, CPU interfaces +0x2000–0x3FFF, virtual interface control
+
+      +0x4000–0x5FFF, virtual CPU interfaces +0x6000–0x7FFF (GIC-400 TRM §3.2 Table 3-1, p. 3-3);
+      the
+
+      derived Low Peripheral and full-map addresses are the base plus those offsets. GICv2 compliance
+
+      and the GICv2 Security Extensions are now located at GIC-400 TRM §1.2 "Compliance" (p. 1-4),
+
+      with §1.1 (p. 1-2) naming both extensions. IHI 0048B chapter 3 is "Interrupt Handling and
+
+      Prioritization" and chapter 4 "Programmers'' Model". The earlier missing-locator FAIL is
+
+      resolved.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/11 "Interrupt controller"
+      format: 1
+  interrupt-ids-at-the-gic:
+    basis: dc2a16810cf2239d29eea67c93c7190b6b9b9fb9858da38d3c89a403b4d102be
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'PPI 25–31 sources match GIC-400 TRM §2.3.2
+
+      Table 2-3 and datasheet Figure 7. SPI blocks 32–47, 48–51, 52, 53, 64–79, 96–159 and 160–216
+
+      match Figure 7 (p. 89). AVS, PCIe INTA–D, MSI, GENET A/B and XHCI numbers match Table 103
+
+      (p. 88) plus 160. PPI active-low level and SPI rising-edge/active-high match §2.3.2–2.3.3
+
+      (p. 2-8).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/12 "Interrupt IDs at the GIC"
+      format: 1
+  shared-interrupt-lines:
+    basis: 0d068853d588d81ec9fbd65c26cbf94485c3e91d709e1743a29e549176844384
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'VC 57/53/54/29/62 groupings, the 23/24/46 pairs,
+
+      PACTL_CS at 0x7E20_4E00, and Figure 6 routing SPI1/SPI2 through AUX_IRQ to 29 despite Table
+      102''s
+
+      "OR of all SPI" label all match §6.2.4 (pp. 86–88; the figure was checked as an image) and §2.1.
+
+      The GIC IDs follow Figure 7.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/13 "Shared interrupt lines"
+      format: 1
+  debug-uart:
+    basis: 69de0394c026e851e2d8833a18d647d2078040af890f8c0a5276fb87c44a3048
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'r1p5 TRM named, base addresses, register offsets, FIFO sizes,
+
+      no IrDA, CTS/RTS only (§11.1, §11.5 Table 172, Table 173 bit table). TXD0/RXD0 on GPIO14/15
+      ALT0
+
+      (Table 171, p. 145). VC 57 / GIC 153 (§6.2.4, Figure 7). Low Peripheral address per §1.2.4.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/14 "Debug UART"
+      format: 1
+  pl011-programming-order:
+    basis: 4c3f5fc0b4df0977551b0d8ecdcb84487b34c433c9a89d5a7d65d9738c68c815
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'disable before reprogramming (§3.3.1 note,
+
+      p. 3-6). CR sequence (§3.3.8, p. 3-16). IBRD/FBRD latched by the LCR_H write (§3.3.7, p. 3-14).
+
+      Transition-through-level interrupts (§3.3.9, p. 3-17), and no TX interrupt when enabled with
+      an
+
+      empty FIFO (§2.8.3 note, p. 2-23). §2.8.3''s own first bullet, and the BCM2711 datasheet''s
+      §11.4
+
+      copy of it, word the TX interrupt as level-based without the note. The TRM''s note settles this,
+
+      so it is not counted as contrary evidence.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/15 "PL011 programming order"
+      format: 1
+  early-console:
+    basis: 0e3d758066dc4fbedb2a52d2986d8b00827bb5d6459b0ea6cc98559cd050d990
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'both `earlycon` strings and the 115200 default (UARTs,
+
+      "Enable early console for Linux"). The 48 MHz, UART0-only, at-most-a-sixteenth `init_uart_clock`
+
+      and the 115200 `init_uart_baud` match the legacy boot options.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/17 "Early console"
+      format: 1
+  usb-controllers:
+    basis: bf582b754128810b366a96a73975cdbb13f49bbe5cca47e31a9d8dd50b3cdc33
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'PCIe-attached USB 3.0 controller on 4B/400, legacy USB
+
+      2.0 on USB-C as a device with `otg_mode=0` default, XHCI host with `otg_mode=1`, no USB 3.0
+
+      controller on CM4 (`otg_mode` section). Consistent with the processor page''s PCIe link to the
+
+      USB ports.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/18 "USB controllers"
+      format: 1
+  mini-uart:
+    basis: 2a7519419a3ff9b1391e78c16f9c00299c49b532d73526ecdaa5935da1f24ad2
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'base 0x7E21_5000 shared with SPI1/2, AUX_MU_IO_REG +0x40,
+
+      AUX_ENABLES +0x04 (Table 2, p. 8). Bit 0 gating register access and the immediate-receive
+
+      warning (Table 4 and following text, pp. 9–10; §2.2, p. 10). AUX_MU_CNTL bits 0/1 reset 1
+
+      (Table 13, p. 14). Core-clock dependence ("Mini UART and core frequency").'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/19 "Mini UART"
+      format: 1
+  timers:
+    basis: fd66431ecb03cad06f565df146435d57e6c9c2dff3524009796266f4ff14bb87
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'core timer IRQs (§6.2.1). ARM_CONTROL bits 7/8 and reset 0
+
+      (Table 105, pp. 92–93). System Timer base, 64-bit counter and four compare channels (§10.1,
+
+      p. 142), VC 0–3 (Table 102). ARM timer base, +0x400 register offsets, variable clock and the
+
+      System Timer advice (§12.1–12.2, Table 192, p. 159). CNTFRQ_EL0 not interpreted by hardware
+
+      (DDI 0487 M.d §D24.10.1).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/20 "Timers"
+      format: 1
+  arm-local-block:
+    basis: ac2d1891347d2dd929262e8505da521e8e24a31aff206f4275ee9af87797970c
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'base and Low Peripheral address, control registers,
+
+      IRQ/FIQ_SOURCE at +0x60/+0x70 (Table 104, pp. 92–93). Sixteen mailboxes with MBOX_SET00 at +0x80,
+
+      distinct from the ARMC/VPU mailboxes (§13.1–13.2, p. 163).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/21 "ARM_LOCAL block"
+      format: 1
+  clocks-and-power:
+    basis: 8902cce1c1ba4edef727234b04fbcdaa6a257acb2651549bcdacfc68e14618d1
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'Clock Manager controls the UART clock (§11.1, p. 144),
+
+      and only the GP clocks are described (§5.4, p. 81; no other CM_ registers in the document).
+
+      Channel 8, tags 0x00030002/0x00030047/0x00038002 and their semantics, rate 0 for a missing clock,
+
+      IDs 1/2/12 and base-clock meaning all match the wiki "Clocks" section.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/22 "Clocks and power"
+      format: 1
+  gpio-and-pinmux:
+    basis: 4df3fda6302ceecd89b453599a2cf41d9f0f4639fc97ce31f0d2e118f50dc037
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: '58 GPIOs in banks 0–27/28–45/46–57 and four interrupt
+
+      lines (§5.1, p. 65). Base and register offsets (Table 63, p. 66). Pull encoding (Table 90, p.
+      74).
+
+      VC 49–52 "GPIO 0–3" (Table 102), GIC per Figure 7.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/25 "GPIO and pinmux"
+      format: 1
+  peripheral-memory-ordering:
+    basis: 593aea8fe2e86cb68dd26c6e09c5887de4b01b32f6f5735c9f28e75ae654e4c6
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'barrier placement and the interrupt-handler
+
+      rules match §1.3 (pp. 6–7). Normal Non-cacheable over-read/merge and Device memory for
+
+      peripherals match A72 TRM §6.4.1 (p. 6-291).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/26 "Peripheral memory ordering"
+      format: 1
+  dtb-runtime-patching:
+    basis: 6e6fc84c56634cd05465e75423da4c693a4515ed4674204f7c9f56ad48943510
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'DTB choice by board revision, edits, config.txt
+
+      parameters and overlays, pointer to the merged tree ("Device Trees, overlays, and parameters").
+
+      `/chosen` firmware parameters ("Firmware parameters").'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Quick-facts/27 "DTB runtime patching"
+      format: 1
+  the-gic-and-arm-local-bases-are-not-legacy-addresses:
+    basis: 1aa990dfeed7735778f86fee5478a9d8c43177358e08d8257bc05428751191e1
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: '"every other
+
+      peripheral address in the datasheet is a legacy master address" is the datasheet''s own scope
+
+      (§6.5.1 and §6.5.2, p. 92: "unlike other peripheral addresses in this document, this is an
+
+      ARM-only address and not a legacy master address"; §1.2.4, p. 6 says the same of the
+
+      document''s peripheral addresses). The full-map and Low Peripheral figures in §1.2.3 are region
+
+      bounds, not peripheral addresses, and §13.2''s restatement for ARM_LOCAL agrees. Both bases,
+
+      0x4_C004_0000 and 0xFF84_0000 for the GIC, match §6.5.1. The earlier overstated-scope FAIL is
+
+      resolved.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Gotchas/1 "The GIC and ARM_LOCAL bases are not legacy addresses."
+      format: 1
+  one-gic-line-serves-many-blocks:
+    basis: 7372ed5d66d026f05545a66de4b214c444c71322269a608d8483eca1e84d1beb
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'the groupings and status-register advice
+
+      match §2.1, §6.2.4 and Figure 6. The ETH_PCIe lines reach the GIC individually (Figure 7), and
+
+      the legacy controller gets only their OR on VC 58 (§6.2.5 text, p. 89).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Gotchas/2 "One GIC line serves many blocks."
+      format: 1
+  peripheral-mode-is-a-three-way-agreement:
+    basis: 910fd7ed79aaedec5e32c5375eeaa13cfcb3b89ba204ed627bcd674f47817a59
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'legacy boot options,
+
+      `arm_peri_high`: enabling high peripheral mode without a compatible device tree "will make your
+
+      system fail to boot", and "currently ARM stub support is missing, so you will also need to load
+
+      a suitable file using `armstub`". The bullet attributes the stub statement to the documentation
+
+      and no longer claims a stub mismatch stops the boot. The earlier FAIL is resolved.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Gotchas/3 "Peripheral mode is a three-way agreement."
+      format: 1
+  pulls-are-set-through-gpio-pup-pdn-cntrl-reg0-3:
+    basis: 9c0f0a113fe20d67bb5b9fd6f6ac80cd0e4d5399e9a14d3d6d8a577be9441da7
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'they are the only pull
+
+      registers in Table 63 (p. 66). Two bits per pin and the read-back of the current pull state
+
+      match Table 90 and its description (p. 74).'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Gotchas/4 "Pulls are set through `GPIO_PUP_PDN_CNTRL_REG0`–`3`."
+      format: 1
+  legacy-dma-reaches-1-gb-at-a-time:
+    basis: 5f7b1958b5662c0e86b11b6bac197aa4dd1419d401d6c595e4c389dbd11e34e1
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'the window is moved with "the PAGE or
+
+      PAGELITE bits" (§1.2.4, p. 6). ENABLE.PAGE (27:24) sets the 1 GB page for "the 30-bit DMA
+
+      engines (DMA0-6)" and PAGELITE (31:28) for "the DMA Lite engines (DMA7-10)" (Table 62, p. 60),
+
+      one field per group, so the setting is shared across the group. The L2 aliases at 0x0 and
+
+      0x8000_0000 "can''t be moved, and are limited to the first 1GB of SDRAM" (§1.2.4, p. 6). The
+
+      earlier FAIL is resolved.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Gotchas/5 "Legacy DMA reaches 1 GB at a time."
+      format: 1
+  the-mini-uart-s-baud-rate-follows-the-core-clock:
+    basis: 266169529fcc139523e54313242f7029bd8b48672243e12a59a3e36c7774c46d
+    verdict: PASS
+    date: '2026-10-08'
+    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
+      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
+    note: 'the UARTs page, "Mini UART
+
+      and core frequency": the baud changes with the core clock and fixing the VPU clock is the remedy.
+
+      The PL011 choice follows from the page''s comparison of the two UART types.'
+    carried_from:
+      repo: hardware-specs-docs
+      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
+      path: specs/resources/bcm2711.verify.md
+      key: Gotchas/6 "The mini UART's baud rate follows the core clock."
+      format: 1
