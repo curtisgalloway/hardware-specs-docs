@@ -175,6 +175,7 @@ facts:
         doc: rock5t-product-brief
         at: [{section: "6.1.1", page: "8"}]
     relates:
+      - {fact: "#debug-console", relation: qualifies}
       - {fact: "rk3588#uart2-pinmux", relation: qualifies}
 
   - id: uart2-state-at-handoff
@@ -396,12 +397,13 @@ facts:
       flash (part XT25F128B, 3.3 V) on the FSPI signals; an onboard 8-bit eMMC (BGA-153, with a
       data strobe wired; 16 to 256 GB in the product brief's section 3.1, whose section 7 order
       codes list E0, not fitted, to E128) on the eMMC controller; a microSD slot on SDMMC0 with
-      card detect; and two M.2 M-key slots with PCIe 3.0 x2 each for NVMe, which the ROM does not
-      read.
+      card detect; and two M.2 M-key slots with PCIe 3.0 x2 each for NVMe, which the schematic's
+      boot-mode table does not list among the boot ROM's devices.
     support:
       - class: doc
         doc: rock5t-schematic
         at:
+          - {page: "13", heading: BOOT MODE CONFIG}
           - {page: "21", heading: SPI/eMMC Flash}
           - {page: "9", heading: RK3588_Flash/SD Controller}
           - {page: "29", heading: Flash-TF Card/DMIC}
@@ -412,6 +414,8 @@ facts:
           - {section: "3.1", page: "4"}
           - {section: "3.2", page: "5"}
           - {section: "7", page: "11"}
+    relates:
+      - {fact: "#boot-order-strap", relation: qualifies}
     todo:
       check: document
       text: the SPI flash's capacity and the eMMC bus mode (HS400) are not stated by the schematic or brief pages cited; take them from the XTX part's datasheet and the brief's block diagram (schematic sheet 3), or read the JEDEC ID and the eMMC bus speed mode on a board.
