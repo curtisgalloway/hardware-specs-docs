@@ -1,0 +1,277 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+format: 2
+spec: rk3588
+spec_file: rk3588.spec.yaml
+spec_sha256: 21bd12093b47de0a6d66b82ede1c753c71512110a294be8f239c0ad071df830a
+canonical: fact-v1
+sources:
+- name: gic600-trm
+  url: https://developer.arm.com/documentation/100336/latest
+  fetch: ok
+  sha256: 500c1d7d733d576ca8de8c3bc4592bfcaf102267a5ddeff01d9e4ef997a7050f
+summary:
+  pass: 1
+  fail: 0
+  unverifiable: 0
+  gap: 10
+  adjudicate: 0
+verdicts:
+  gic600-register-pages:
+    basis: 8877267e5a9fec4e4bab2a6979c93611416dc73b3447bea15a0fff84b58a1272
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rk3588
+    note: 'Fetched the GIC-600 TRM (100336_0106_00_en) from the declared documentation-service URL;
+      sha256 matches the declared value and the PDF has 216 pages. Section 4.1.1 and Table 4-1 (printed
+      pages 4-103 and 4-104) list Offset[x:16] page indices: GICD 0, GICA 1, GICT 2, GICP 3, GITSn
+      4+(ITSnum x 2), GITSn translate 5+(ITSnum x 2), GICR LPI 4+(2 x ITScount)+(RDnum x 2), GICR
+      SGI 5+(2 x ITScount)+(RDnum x 2), GICDA 4+(2 x ITScount)+(RDcount x 2) "page after last GICR
+      page", and RDcount equals the number of CPU cores. These match the claim, and the derived start
+      (4+2k) x 0x1_0000 with a 2-page (128 KB) redistributor stride follows arithmetically. The "64
+      KB" page size is implied by the Offset[x:16] notation (page index is address bit 16 and up);
+      the TRM text does not state "64 KB" in words, which is a minor gap in explicitness only. Contrary-evidence
+      search covered the whole TRM text (section 4.1.2 discovery, the multichip operation section
+      3.17, GICR_TYPER and virtual-LPI feature bits): section 4.1.2 says GIC-600 has two pages per
+      redistributor because it does not support virtual LPIs, which agrees with the claim''s stride.
+      Multichip systems add chip_id in ProcessorNumber but the page layout is unchanged; no conflicting
+      layout found. The claim''s "in any GIC-600" holds for the layout given the TRM describes the
+      single product; the TRM revision r1p6 is the one cited. The "resolve" tool reports 0 anchors
+      for this databook-only spec, so there is no machine anchor; the reading was done by hand.'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-second-docs
+      verdict: PASS
+      date: 2026-10-09
+      note: 'gic600-trm fetched from the documentation-service retrieval URL; sha256 matches the declared
+        value; document marked Non-Confidential (issue 0106-00, r1p6). Section 4.1.1, Table 4-1, pages
+        4-103 and 4-104: page index is Offset[x:16] (64 KB pages); GICD 0, GICA 1, GICT 2, GICP 3,
+        GITSn 4+2n and translate 5+2n, GICR LPI 4+2*ITScount+2*RDnum and SGI page 5+..., GICDA after
+        the last GICR page; the note gives RDcount equal to the number of CPU cores. The closing base
+        + (4+2k)*0x1_0000 at a 128 KB stride is arithmetic on the table, not a separate inference.
+        Contrary-evidence search (sections 4.1.2 Discovery, the introduction''s Redistributor description,
+        GICD_CFGID 4.2.11): none found; section 4.1.2 notes that in a multichip configuration each
+        chip has its own first Redistributor page, so "from the GIC base" is per chip, which does
+        not contradict the claim. Citation precision exact.'
+  gic-instance:
+    basis: 36efed6661b6cc2cb9acab4f3ff0db09d572f6bfa9e40daea5c3aa18624be0ef
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'TRM r1p6 (printed pages 4-103 to 4-104, 4-111, 4-120) is generic: GICD_IIDR gives product
+      ID 0x2 and variant/revision (r/p); GICD_CFGID has no ITS count; ITS and redistributor page positions
+      follow the layout table. The TODO method can settle revision (GICD_IIDR) and redistributor count
+      (GICR_TYPER.Last). It does not read ITS registers; ITS count is derivable only from the confirmed
+      redistributor frame offset ((offset/64KB - 4)/2, per the TRM''s register-map table) or by probing
+      GITS pages 4+2n. Suggest the TODO say so. Mode: full reading. Gap fact (no support, TODO). Contrary
+      evidence for a supported value was not checked because there is none; the claim is scoped to
+      documents read for this base, and its only declared document is the GIC-600 TRM, which is generic
+      and names no SoC. Citation precision is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: 'FULL reading. No support; a gap fact. The TODO can settle base, revision and redistributor
+        count (GICD_IIDR, GICD_TYPER, GICR_TYPER.Last walk), but none of the listed registers reports
+        the ITS count: GIC-600 TRM r1p6 section 4.2.11 Table 4-14 (GICD_CFGID, page 4-120) has no
+        ITS field. Add to the method: probe GITS_IIDR at pages 4 + 2n, or infer k from the first GICR
+        frame offset via Table 4-1. Citation precision imprecise and contrary evidence not checked
+        because there is no citation or value.'
+  gic-state-at-handoff:
+    basis: 38d6eb9cc8ea4198b7209b74eeaf538493e925c7e0e74d5754e95f5a55e358f1
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'TRM GICD_CTLR (printed page 4-109) lists DS and ARE_NS and defers security-state views
+      to the Arm GIC architecture specification, which is not a declared document here. The TODO''s
+      non-secure read of GICD_CTLR can observe DS and ARE_NS, and the TODO correctly states that per-interrupt
+      groups cannot be seen from the non-secure side when DS is 0. Method is adequate for what it
+      claims to settle. Mode: full reading. Gap fact (no support, TODO). Contrary evidence for a supported
+      value was not checked because there is none; the claim is scoped to documents read for this
+      base, and its only declared document is the GIC-600 TRM, which is generic and names no SoC.
+      Citation precision is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+  cpu-mpidr:
+    basis: 711b27ac18a667a698138b363141dfa57ece24ff5a63cb539f0eea601271e23a
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Deficiency for the author: the claim covers ''which core numbers are Cortex-A55 and which
+      Cortex-A76'', but the TODO reads only MPIDR_EL1. Affinity values do not encode the core type;
+      the type is in MIDR_EL1 (PartNum). The MPIDR read settles the affinity values and MT bit only.
+      Proposed TODO addition: also read MIDR_EL1 on each core and record PartNum per core. The GIC-600
+      TRM (GICD_CFGID AFF fields, printed page 4-120) is generic and gives no RK3588 values. Mode:
+      full reading. Gap fact (no support, TODO). Contrary evidence for a supported value was not checked
+      because there is none; the claim is scoped to documents read for this base, and its only declared
+      document is the GIC-600 TRM, which is generic and names no SoC. Citation precision is imprecise
+      because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. The revised hardware TODO (read MPIDR_EL1 on each
+        core of a booted board, including MT) can observe the question; secondary cores need PSCI
+        CPU_ON first. Precision imprecise and contrary evidence not checked (no citation).
+  system-counter:
+    basis: c82e986f0f3c6c9ff9aa1950c2170fb264b5e00c194596e9df6ca36a583b8376
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Deficiency for the author: the frequency half of the TODO is sound (CNTFRQ_EL0 read plus
+      an independent-clock timing check). The interrupt-ID half is not: reading GICR_ICFGR0/1 and
+      comparing with the recommended PPI assignment shows trigger configuration of each PPI number,
+      not which PPI number each timer raises, so the IDs would be assumed from the recommendation.
+      Proposed addition, matching the interrupt-map TODO: arm each timer with its interrupt masked
+      at the GIC and read GICR_ISPENDR0 to find the pending PPI bit, then read GICR_ICFGR1 for its
+      trigger. Mode: full reading. Gap fact (no support, TODO). Contrary evidence for a supported
+      value was not checked because there is none; the claim is scoped to documents read for this
+      base, and its only declared document is the GIC-600 TRM, which is generic and names no SoC.
+      Citation precision is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: 'FULL reading. No support; a gap fact. The CNTFRQ and external-reference timing parts
+        of the TODO can observe the frequency. The interrupt-ID part is weak: GICR_ICFGR1 shows configured
+        trigger type (ICFGR0 covers SGIs only) and comparing with BSA recommendations assumes the
+        integrator followed them; to observe the IDs, arm each timer with a short TVAL and read GICR_ISPENDR0.
+        Precision imprecise and contrary evidence not checked (no citation).'
+  address-map:
+    basis: b7bc03bda83e2e76af68955c278513f380373cb93e7a9a0c09fa463f386034f1
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'The TODO is a document search with a stated confidentiality condition and a fallback to
+      the GPL overlay; it can settle the claim if a non-confidential datasheet carries a map, and
+      it already notes the full map sits in the non-public TRM. No contradiction with the declared
+      document. Mode: full reading. Gap fact (no support, TODO). Contrary evidence for a supported
+      value was not checked because there is none; the claim is scoped to documents read for this
+      base, and its only declared document is the GIC-600 TRM, which is generic and names no SoC.
+      Citation precision is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. The document TODO, conditioned on a datasheet published
+        without confidential marking, with the GPL overlay as fallback, can settle it. Precision imprecise
+        and contrary evidence not checked (no citation).
+  interrupt-map:
+    basis: 78c270d71eb7dc7fc64b6907338dcbfa62ee0765185fe3f5d31635bb1e3c5436
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'The TODO''s board method (provoke the peripheral interrupt with it masked at the GIC, read
+      GICD_ISPENDR bit n for SPI n, read GICD_ICFGR for the trigger) can observe both quantities for
+      each named controller, and the TODO says unexercised controllers stay unknown. Mode: full reading.
+      Gap fact (no support, TODO). Contrary evidence for a supported value was not checked because
+      there is none; the claim is scoped to documents read for this base, and its only declared document
+      is the GIC-600 TRM, which is generic and names no SoC. Citation precision is imprecise because
+      nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. Provoking each interrupt and reading GICD_ISPENDR
+        observes the ID (pending latches while disabled). GICD_ICFGR for SPIs is programmable, so
+        reading it shows the configured trigger, not the wired one; the method should say the trigger
+        type stays unknown unless a level source is held and deasserted to see whether pending clears.
+        Precision imprecise and contrary evidence not checked (no citation).
+  uart-programming-model:
+    basis: 69dd999ed7d469aa7a4e2ba51eaa3cd1a8af175e6f148a7b42593b2e518a44a1
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'The TODO methods (identification/parameter registers of the IP, FIFO fill count with the
+      transmitter held off, access experiments for stride and width) can observe identity, depth,
+      stride and width. It states that it cannot observe the line-control-write-during-transfer behavior
+      and names a databook as the closer; that limit is honest and leaves that clause open. Mode:
+      full reading. Gap fact (no support, TODO). Contrary evidence for a supported value was not checked
+      because there is none; the claim is scoped to documents read for this base, and its only declared
+      document is the GIC-600 TRM, which is generic and names no SoC. Citation precision is imprecise
+      because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. The TODO can observe IP identity and FIFO depth
+        (the parameter register, if configured, also encodes FIFO mode) and states correctly that
+        it cannot observe line-control-during-transfer behavior. Precision imprecise and contrary
+        evidence not checked (no citation).
+  uart2-pinmux:
+    basis: f32cdddc96b87ce8be8146ef3acab83c56094e57fbcef213a9c7eceab203ea10
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'The TODO is a document search (function names only) plus a hardware read of the IOC registers
+      the GPL overlay names, on a board where the console works; both can observe the claimed register
+      fields and values. The board spec cites the schematic for pin names, consistent with the claim''s
+      parenthetical. Mode: full reading. Gap fact (no support, TODO). Contrary evidence for a supported
+      value was not checked because there is none; the claim is scoped to documents read for this
+      base, and its only declared document is the GIC-600 TRM, which is generic and names no SoC.
+      Citation precision is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. The TODO correctly limits a datasheet to function
+        names and sends register fields to the GPL overlay or an IOC readback; it can settle the question.
+        Precision imprecise and contrary evidence not checked (no citation).
+  storage-controllers:
+    basis: 4694134795b1964ed0ab033d80596f7d347d1c8de378f1b885fb9c2909976b81
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'TODO is a per-controller source search with a stated confidentiality condition, and can
+      settle the claim. Advisory: the TODO text asserts, uncited, that the SD controller is a DesignWare
+      MMC variant; hedge it as what the GPL overlay''s compatible names, or cite it. Mode: full reading.
+      Gap fact (no support, TODO). Contrary evidence for a supported value was not checked because
+      there is none; the claim is scoped to documents read for this base, and its only declared document
+      is the GIC-600 TRM, which is generic and names no SoC. Citation precision is imprecise because
+      nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. The per-controller TODO is sound and correctly scopes
+        the SD Host Controller standard to the eMMC controller only. Precision imprecise and contrary
+        evidence not checked (no citation).
+  psci-not-documented:
+    basis: 08c10c669ea9ce477eec56a1ab72131d657dad889347706b303c6116ea744524
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'The SMC call of PSCI_VERSION from the EL2 shim, PSCI_FEATURES and the device tree ''method''
+      property can settle version and advertised conduit. Advisory: an HVC from EL1 is taken by the
+      EL2 software that is the shim itself, so it cannot show that firmware refuses HVC; the conclusion
+      should rest on the SMC result and the method property. Mode: full reading. Gap fact (no support,
+      TODO). Contrary evidence for a supported value was not checked because there is none; the claim
+      is scoped to documents read for this base, and its only declared document is the GIC-600 TRM,
+      which is generic and names no SoC. Citation precision is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. PSCI_VERSION and PSCI_FEATURES over SMC settle the
+        version and SMC conduit. The HVC attempt from EL1 traps to the kernel shim's own EL2 when
+        the kernel enters at EL2, so it tests the shim, not firmware; drop it or restrict it to an
+        EL1 entry. Precision imprecise and contrary evidence not checked (no citation).

@@ -1,0 +1,483 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+format: 2
+spec: rock5t
+spec_file: rock5t.spec.yaml
+spec_sha256: 6916b736a54029f4674aa006774283c31a6513b6521ae4fca4da51fa884d7bd4
+canonical: fact-v1
+sources:
+- name: rock5t-schematic
+  url: https://dl.radxa.com/rock5/5t/docs/hw/radxa_rock5t_schematic_v1.2_20250109.pdf
+  fetch: ok
+  sha256: 82144737b9848a7784d800c4f6110029997e2a557a0667a9f38f0b793d334491
+- name: rock5t-product-brief
+  url: https://dl.radxa.com/rock5/5t/docs/rad-doc-0117_radxa_rock5t_product_brief__revision_1.4_gd4f9b5b.pdf
+  fetch: ok
+  sha256: 4d1f0f030114abed6e73cc6844aafa1e02c1f2b7ee602ed304cf38dec0c891b4
+- name: radxa-docs-serial
+  url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/general/_serial.mdx
+  fetch: ok
+  commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+- name: radxa-docs-maskrom-linux
+  url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/rock5/rock5t/low-level-dev/maskrom/linux.md
+  fetch: ok
+  commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+- name: radxa-docs-rkdeveloptool
+  url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/dev/_rkdeveloptoolV2.mdx
+  fetch: ok
+  commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+- name: radxa-docs-uboot
+  url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/dev/_u-boot.mdx
+  fetch: ok
+  commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+- name: radxa-docs-rock5t-uboot
+  url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/rock5/rock5t/low-level-dev/u-boot.md
+  fetch: ok
+  commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+- name: radxa-docs-nvme
+  url: https://github.com/radxa-docs/docs/blob/35413cf584c3a3942904f0b9cef9ea6ace64fbd3/i18n/en/docusaurus-plugin-content-docs/current/common/dev/_nvme.mdx
+  fetch: ok
+  commit: 35413cf584c3a3942904f0b9cef9ea6ace64fbd3
+- name: uboot-docs-rockchip
+  url: https://github.com/u-boot/u-boot/blob/5508406582f6f7120dce0c4b3059819a41788db2/doc/board/rockchip/rockchip.rst
+  fetch: ok
+  commit: 5508406582f6f7120dce0c4b3059819a41788db2
+- name: uboot-docs-booti
+  url: https://github.com/u-boot/u-boot/blob/5508406582f6f7120dce0c4b3059819a41788db2/doc/usage/cmd/booti.rst
+  fetch: ok
+  commit: 5508406582f6f7120dce0c4b3059819a41788db2
+- name: linux-booting
+  url: https://github.com/torvalds/linux/blob/8d3ae59288f1e7d58d76558a6ee96d533bc5019f/Documentation/arch/arm64/booting.rst
+  fetch: ok
+  commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+summary:
+  pass: 15
+  fail: 0
+  unverifiable: 0
+  gap: 3
+  adjudicate: 0
+verdicts:
+  cpu-complex:
+    basis: 13818743c67eb6287bb3c211878b75cea1a9dc02859344b95b331fd52400f7f4
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Product brief section 3.1 (p. 4, PDF sha256 matches the declared value) lists "Rockchip
+      RK3588 / RK3588J SoC" and "Quad Cortex-A76 @ 2.2/2.4GHz and a quad Cortex-A55 @ 1.8GHz based
+      on Arm DynamIQ configuration", which matches the claim. Searched the whole brief and the schematic
+      (V1.2, block diagram sheet 3 and SoC sheets show plain RK3588) for a conflicting core count,
+      clock or SoC grade; none. The brief does not say which SoC carries which clock; the claim keeps
+      "or". The TODO method (read order information and industrial-variant documents) is workable:
+      section 7 only maps J0 commercial and J1 industrial grade (-40 to 85 C) and never names RK3588J,
+      so the question remains open.'
+    contrary_evidence: none-found
+    citation_precision: exact
+  debug-console:
+    basis: a680e2e30b1ba02653399f849666f427fc82abd37d6b1381f9e3f62825867fe0
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Fetched the shared page at the pinned commit. Opening paragraph: pins 8 (TX) and 10 (RX)
+      on the GPIO pins. Serial Connection table: GND pin 6, TX pin 8, RX pin 10 (the non-rock5itx,
+      non-o6 branch). The ROCK 5T wrapper (rock5/rock5t/radxa-os/serial.md at the same commit) includes
+      this page with platform "rk" and no model prop, so applicability of the model-conditioned pin
+      table rests on the rendered page; the rendered ROCK 5T page shows the same pin 6/8/10 table
+      (corroboration only, unpinned). Rockchip tip under Preparation: "1500000n8 without flow control";
+      the CP210X/PL2303x baud-rate limits and FT232RL power issues are stated. Contrary search: FAQ
+      says hardware flow control may be on by default and should be turned off, which agrees with
+      "no flow control"; nothing else conflicts. "40-pin header" is from the brief and schematic,
+      not this page (page says "GPIO pins"). The stop bit (the "1" in 8N1) is stated only under "Using
+      Serial Tools" (stop bit: 1), which is not cited. To narrow the citation: Add {heading: Using
+      Serial Tools} to the support anchors; the stop-bit value appears only there. Optionally cite
+      the brief section 3.2 for the 40-pin header.'
+    contrary_evidence: none-found
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-second-docs
+      verdict: PASS
+      date: 2026-10-09
+      note: 'radxa-docs-serial read at commit 35413cf5: the opening paragraph names pins 8 (TX) and
+        10 (RX); the Preparation tip gives 1500000n8 without flow control for Rockchip products and
+        the CP210X/PL2303 baud and FT232RL power warnings; Serial Connection''s table gives GND pin
+        6, TX pin 8, RX pin 10. The ROCK 5T wrapper (rock5/rock5t/radxa-os/serial.md at the same commit)
+        imports this page with platform "rk". Contrary-evidence search: the schematic sheet 36 (40pin/LED/RTC/EEPROM)
+        wires header pin 8 and 10 to UART2_TX_M0 and UART2_RX_M0 and pin 6 to ground, consistent;
+        the header also carries UART2 M2 on pins 36/38 (product brief 6.1.1) but Radxa names pins
+        8/10 as the console. None found. Citation precision exact.'
+  uart2-state-at-handoff:
+    basis: eec313134247beed7dbac994da3f4dd02c875f001cc0dd2ae1fc85ef5b8e0cc1
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Mode: full reading. Gap fact. The TODO (transmit a byte at kernel entry with no setup and
+      watch the header, then read back the pin-multiplexing and divisor registers, once under the
+      stock loader and once under mainline U-Boot) can observe pin mux, running baud clock and divisor,
+      and correctly separates stock from mainline. Read for contrary evidence: the Radxa serial page
+      says the default Rockchip console is 1500000 8N1, which concerns the loader''s own console,
+      not the state at kernel entry. Contrary evidence for a supported value was not checked because
+      there is none. Citation precision is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. The byte test under both loaders observes the claim.
+        Reading the divisor needs LCR.DLAB set, a line-control write the DesignWare UART may reject
+        while busy; the method should drain the transmitter first. Precision imprecise and contrary
+        evidence not checked (no citation).
+  mainline-boot-chain:
+    basis: abad0a2e6fd2b55c2035c65f3b01d86685dc0874460ccf34ee67ec470dc5e9ca
+    verdict: PASS
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Mode: full reading. U-Boot Rockchip documentation at the pin: the rk3588 board list contains
+      ''Radxa ROCK 5B/5B+/5T (rock5b-rk3588)''; Building/TF-A says TF-A is required for ARM64 images
+      and to use Rockchip''s BL31 binary from rkbin where TF-A is unavailable (the rk3588 example
+      sets BL31 to an rkbin file); Building/TPL says to use Rockchip''s rkbin DDR binary as ROCKCHIP_TPL
+      where U-Boot lacks DRAM init (the rk3588 example sets it); Flashing, Package the image with
+      U-Boot TPL/SPL, says to dd u-boot-rockchip.bin at seek=64 for SD and to write u-boot-rockchip-spi.bin
+      to offset 0 of SPI flash. The claim''s conditional wording matches. Searched the rest of the
+      page, including the miniloader alternative and the eMMC fastboot section, for qualifications
+      on rk3588; none. TODO (confirm stages on a mainline console) can observe what the page leaves
+      unstated.'
+    contrary_evidence: none-found
+    citation_precision: exact
+  kernel-entry-contract:
+    basis: 025acd83584a31ce95d49c7bbf4aeed9829e1d0b966465203694351f7d3e7ef2
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Documentation/arch/arm64/booting.rst at the pinned commit, section "4. Call the kernel
+      image", "Before jumping into the kernel" list: x0 = physical address of the dtb, x1 to x3 =
+      0, all of PSTATE.DAIF masked, non-secure EL2 (RECOMMENDED) or EL1, MMU off, CNTFRQ programmed
+      and CNTVOFF consistent on all CPUs. The claim matches. Qualifiers the claim leaves out but does
+      not contradict: the register settings are for the primary CPU, and entering at EL1 requires
+      CNTHCTL_EL2.EL1PCTEN set where available. Contrary search of the rest of the file (cache and
+      coherency conditions, versions prior to v4.x notes) found nothing that changes the listed values.
+      The "not stated" half is an absence claim about the documents read, consistent with the TODO;
+      reading CurrentEL from the kernel shim under each loader is a method that can observe the question.'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-second-docs
+      verdict: PASS
+      date: 2026-10-09
+      note: 'linux-booting at 8d3ae592, section 4 Call the kernel image: x0 = dtb physical address,
+        x1-x3 = 0, PSTATE.DAIF all masked, non-secure EL2 (RECOMMENDED) or EL1, MMU off, CNTFRQ programmed
+        and CNTVOFF consistent on all CPUs. The claim is a subset: the section also requires DMA quiesced,
+        image cleaned to PoC, coherency and system-register initialization (SCR_EL3.HCE at EL2, CNTHCTL_EL2.EL1PCTEN
+        at EL1); the claim does not say its list is complete, but an author may want "among other
+        conditions". The ROCK 5T part (EL not stated) matches the documents read. TODO (read CurrentEL)
+        can settle it. Contrary-evidence search over the whole of section 4 and section 1-3: none
+        found. Citation precision exact.'
+  kernel-image-format:
+    basis: 7005ce56cff1e17780acb9a35eb17a127be6b3648ef00ee930b61abe31f5fb74
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'doc/usage/cmd/booti.rst at the pin, Description: booti boots a flat or compressed Image;
+      "addr ... defaults to CONFIG_SYS_LOAD_ADDR"; compressed images need kernel_comp_addr_r and kernel_comp_size.
+      booting.rst section 2: dtb on an 8-byte boundary, not exceeding 2 megabytes. Section 4: the
+      Image must be placed text_offset bytes from a 2MB aligned base in usable RAM with at least image_size
+      bytes free. All values in the claim match. Contrary search: the booti example log shows U-Boot
+      moving the Image to its text_offset position itself (so the loader need not pre-place it), kernel_comp_size
+      has a 10x decompressed limit, and booting.rst says image_size 0 (older kernels) means text_offset
+      0x80000; none contradicts the stated requirements. Scope caveat: booti.rst is U-Boot v2026.10
+      (mainline) and the stock loader is a 2017.09 vendor build, so the environment variables and
+      defaults are not established for the stock loader; the claim says "U-Boot''s booti" without
+      a version, and the TODO (print the stock environment) is the right method.'
+    contrary_evidence: found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-second-docs
+      verdict: PASS
+      date: 2026-10-09
+      note: 'uboot-docs-booti (v2026.10) Description: flat or compressed Image; compressed needs kernel_comp_addr_r
+        and kernel_comp_size; addr defaults to CONFIG_SYS_LOAD_ADDR. linux-booting section 4: Image
+        placed text_offset bytes from a 2 MB aligned base in usable RAM, at least image_size bytes
+        free; section 2: dtb 8-byte aligned, at most 2 MB. Contrary-evidence search: the booti page
+        documents mainline U-Boot v2026.10, while the stock loader is reported elsewhere in this spec
+        to be a 2017.09-based vendor build, so the compressed-Image path describes mainline booti
+        and may not hold for the stock loader; the claim should scope "U-Boot''s booti" to mainline.
+        No conflicting statement found in the cited documents. Citation precision exact.'
+  ram-options:
+    basis: 96f57c00758dfec1d3668174aa5ec74f71142a28299761b79c52656aff300fd1
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Brief section 3.1 (p. 4): "64bit LPDDR5 RAM options: 4GB, 8GB, 16GB, 24GB, 32GB"; section
+      7 (p. 11) order codes D4, D8, D16, D24, D32. Schematic sheet 15 is titled LPDDR5_315P_2X32bit,
+      shows two packages (CH0, CH1) with the device on the sheet labeled MT62F1G32D4DS-031 WT 4GB;
+      block diagram sheet 3 labels DDR_CH0_32bit and DDR_CH1_32bit. That supports "two 32-bit channels"
+      (64-bit total). Contrary search: the revision table says v1.4 "Update memory parameters", and
+      the schematic sheet shows only the 4 GB part, so 8 to 32 GB rest on the brief; no document conflicts.
+      Note the controller itself has 16-bit sub-channels (each package shows A and B halves), which
+      the claim''s "two 32-bit channels" follows the schematic labels for.'
+    contrary_evidence: none-found
+    citation_precision: exact
+  ram-map-and-reservations:
+    basis: 082e25df0a5fbed45c0e2f1820030b31da909bc66064ec8b898b5ea30973ff9d
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Mode: full reading. Gap fact with relates to rk3588#address-map. TODO (dump the memory
+      node, reserved-memory and memreserve entries of the device tree the stock loader passes, per
+      RAM size) can settle where RAM appears and which ranges are declared reserved; the TODO states
+      it cannot show what BL31 or OP-TEE write outside their reservations, so that clause stays open.
+      Contrary evidence for a supported value was not checked because there is none. Citation precision
+      is imprecise because nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: GAP
+      date: 2026-10-09
+      note: FULL reading. No support; a gap fact. The device-tree dump settles the declared ranges,
+        and the TODO correctly says writes outside reservations stay unknown. RAM placement per size
+        also needs the memory node, which the method includes. Precision imprecise and contrary evidence
+        not checked (no citation).
+  boot-order-strap:
+    basis: b8eabddd6772d69e43528692f7c3f3ac5cf632e0b14293e6ea8fee363cd42632
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Schematic sheet 13 (rendered, labeled BOOT MODE CONFIG): net BOOT_SARADC_IN0 is pulled
+      to VCCA_1V8_S0 through R1511 (100K) with R1509 shown "DNP" to ground. TABLE 1 row LEVEL7: Rup
+      100K, Rdown DNP, ADC 4095, 1.8V, boot mode "FSPI_M2-FSPI_M1-FSPI_M0-EMMC-SD Card-USB". This
+      matches the claim, including the order and level number. The SoC symbol shows SARADC_IN0_BOOT
+      on the SARADC block. Contrary search: the other table rows (levels 2 to 6) and the separate
+      Recovery key on SARADC_IN1 (SW9208) do not apply with R1509 not fitted; no conflicting note
+      on the sheet. The order is the schematic table''s wording, not a Rockchip ROM document, which
+      the claim states ("which the schematic''s table names").'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-second-docs
+      verdict: PASS
+      date: 2026-10-09
+      note: 'Schematic sheet 13 (RK3588_U SARADC/OTP, BOOT MODE CONFIG, rendered and read): pin AM16
+        SARADC_IN0_BOOT on net BOOT_SARADC_IN0; R1511 100K to VCCA_1V8_S0, R1509 DNP to ground; Table
+        1 row LEVEL7 (Rup 100K, Rdown DNP, ADC 4095, 1.8 V) reads "FSPI_M2-FSPI_M1-FSPI_M0-EMMC-SD
+        Card-USB". Contrary-evidence search: the sheet''s Recovery switch SW9208 sits on SARADC_IN1,
+        not the boot input; no other strap found. None found. Citation precision exact.'
+  maskrom-strap:
+    basis: ccd8fb7402062bc6bd8f4300809bfe104561ac74d57cefa960f983503cbd4ed0
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Schematic sheet 13: switch SW1 labeled Maskrom connects BOOT_SARADC_IN0 to ground; TABLE
+      1 LEVEL1 is Rup DNP, Rdown 100K, ADC 0, 0V, boot mode "USB (Maskrom mode)". Brief section 3.2
+      (p. 5) lists "1x Maskrom button" among the miscellaneous items. The claim''s "skips storage
+      and waits for code over USB" is the schematic''s "USB" boot mode reading; it matches. Contrary
+      search: the brief also lists a separate Recovery button (schematic SW9208 on SARADC_IN1), which
+      is a different function and does not alter this one; Radxa''s Maskrom page also requires removing
+      the microSD card first, a procedural step rather than a conflict with the strap.'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-second-docs
+      verdict: PASS
+      date: 2026-10-09
+      note: 'Schematic sheet 13: SW1 "Maskrom" connects BOOT_SARADC_IN0 (pins 2/4) to ground (pins
+        1/3); Table 1 LEVEL1 (0 V) is "USB (Maskrom mode)". Product brief 3.2 (printed page 5) lists
+        a Maskrom button. "Skips storage" reads the LEVEL1 row, which lists USB alone. Contrary-evidence
+        search: none found. Citation precision exact.'
+  maskrom-recovery:
+    basis: cafaa3c5b06fe22853a01c93633049ab1855dc40c600efb92cfa9daba0ae0966
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'ROCK 5T Maskrom page at the pin (rock5/rock5t/low-level-dev/maskrom/linux.md), "Enter to
+      Maskrom" filled by the ROCK 5T steps: remove the microSD card and power, hold the Maskrom button,
+      insert the USB cable into the Type-C port with the other end to the computer, power on. The
+      shared rkdeveloptool page: "Flash Loader" is rkdeveloptool db `<loader>` with loader rk3588_spl_loader_v1.08.111.bin,
+      "Flash System Image" is wl 0 `<image>` after xz -d (uncompressed), "Reboot" is rkdeveloptool
+      rd, and the tip says it cannot select a Maskrom device or the storage medium written to. All
+      match. One wording point: the page says one device and one storage medium are normally connected,
+      and the claim''s "the one storage device it finds" is a fair paraphrase. The page never says
+      "sector"; wl 0 is the begin-sector argument of rkdeveloptool (not shown in the cited pages),
+      so "from sector 0" rests on tool knowledge outside the citation. Contrary search: the page''s
+      "this should normally put it into Maskrom mode" is the only hedge; no conflicting procedure
+      found. To narrow the citation: Cite the rkdeveloptool usage text (wl `<BeginSec>` `<File>`)
+      for the sector meaning, or write ''at address 0 as rkdeveloptool wl numbers it''.'
+    contrary_evidence: none-found
+    citation_precision: imprecise
+  boot-storage:
+    basis: f3a45a0b42a4295bee6ca41c7eabf8a5b13575f48b3bf3c60d6f056b29000250
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r3-primary
+    note: 'FULL reading of the reworded claim. Schematic V1.2 (hash matched) sheet 13 BOOT MODE CONFIG,
+      Table 1: level 7 (R1511 100K pull-up, R1509 DNP, 1.8 V) reads ''FSPI M2 - FSPI M1 - FSPI M0
+      - eMMC - SD Card - USB''; no NVMe or PCIe entry anywhere in the table, which is exactly what
+      the revised wording asserts (the table does not list it; it does not assert the ROM never reads
+      NVMe). Sheet 21: XT25F128BWOI/HGA on VCC_3V3_S3 with FSPI-CS0/D0-D3/CLK; BGA-153 eMMC with D0-D7,
+      CMD, CLK, RST and DATA_STROBE (R138 22R). Sheet 9: eMMC and FSPI/SDMMC0 pad groups. Sheet 29:
+      TF card J4 on SDMMC0 with SDMMC_DET_L. Sheet 24: two M.2 M-key sockets, ports 0 and 1, two lanes
+      each (PCIE30_PORT0 lanes 0-1, PORT1 lanes 2-3). Brief 1.4 (hash matched) section 3.1 page 4:
+      eMMC options 16 to 256 GB; section 3.2 page 5: micro SD slot, 2x M.2 M key PCIe 3.0 2-lane;
+      section 7 page 11: E0 (not soldered), E16 to E128. All numbers and the three-of-four count follow.
+      The #boot-order-strap relation agrees (same sheet 13 table). The TODO (SPI capacity from the
+      XT25F128B datasheet, eMMC HS400 mode) names observable methods and the claim does not state
+      those values. Contrary search: the brief also lists an M.2 B key (4G) slot, which is not storage
+      and is not claimed; no source read shows the ROM reading PCIe.'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r3-second
+      verdict: PASS
+      date: 2026-10-09
+      note: 'FULL reading; document hashes match. Schematic sheet 13 BOOT MODE CONFIG table lists
+        only FSPI M2/M1/M0, eMMC, SD card and USB (no PCIe), supporting both "the boot ROM reads three"
+        (with #boot-order-strap, declared) and the revised NVMe wording. Sheet 21 (SPI/eMMC Flash):
+        XT25F128BWOI on VCC_3V3_S3 with FSPI clock, chip select and D0-D3 nets; eMMC footprint EMMC_B153
+        with eMMC_D0-D7 and eMMC_DATA_STROBE. Sheet 9: eMMC nets on the RK3588 EMMC controller bank
+        and SDMMC0 data. Sheet 29: TF card on SDMMC0 with SDMMC_DET_L. Sheet 24: two M.2_NGFF_MKEY_SOCKET
+        parts on PCIe 3.0 port 0 (lanes 0-1) and port 1 (lanes 2-3). Brief 3.1 (p4): eMMC 16 to 256
+        GB; 3.2 (p5): microSD slot, two M.2 M-key PCIe 3.0 2-lane; section 7 (p11): E0 not soldered
+        through E128. Contrary-evidence search: the boot-mode table''s other levels and the sheet
+        3 block diagram; none found. TODO method can settle the remainder: sheet 3 states "eMMC 5.1
+        HS400" and the XTX part number encodes 128 Mbit. Citation precision exact.'
+  nvme-needs-spi-loader:
+    basis: 7b7372141cc52a080cbebefe50624e0c8bf60bc23fbff4465d8dd3309a85b4a9
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Shared NVMe page at the pin (the ROCK 5T wrapper install-os/nvme.md includes it with model
+      rock-5t): "Overall Steps" lists MicroSD boot disk, rsetup to flash SPI, flash the image to NVMe,
+      remove the microSD card and boot from NVMe; "Booting the System Normally" says the microSD boot
+      is used to obtain spi.img and flash it to SPI; "Using System Tool rsetup to Flash SPI" gives
+      the Update SPI Bootloader steps. The claim''s procedure statement matches. The ROM-device limit
+      is from schematic sheet 13 table 1 (FSPI, eMMC, SD card, USB; no NVMe), reached through the
+      declared relates to boot-order-strap. Contrary search: nothing in the page says SPI is required
+      (only that this is the procedure), and the sentence "that bootloader then loads the system from
+      NVMe" is implied by the step order rather than stated. The claim body is worded as Radxa''s
+      procedure and so holds; the section title "NVMe boot needs the bootloader in SPI flash." is
+      stronger than the evidence (it would be an inference from procedure plus the ROM table), and
+      the cited anchors omit the heading "Remove SD Card and Boot from NVMe". To narrow the citation:
+      Add {heading: Remove SD Card and Boot from NVMe}; reword the title to ''Radxa''s NVMe procedure
+      writes the SPI bootloader first'', or add an inference fact with premises (procedure, ROM table)
+      for ''needs''.'
+    contrary_evidence: none-found
+    citation_precision: imprecise
+  ethernet:
+    basis: 655a77b27b255e1e8b1fba22ea21b23a96ead47555cba1546de13fd0f433169e
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
+    note: 'Schematic sheet 25 (PCIE TO RJ45_1) shows the Realtek symbol RTL8125B(S)/RTL8125BG with
+      PCIE20_0 TX/RX/REFCLK; sheet 26 (PCIE TO RJ45_2) shows the same part with PCIE20_2; each uses
+      one TX and one RX pair (x1) and the block diagram sheet 3 labels both links PCIE2.0 and marks
+      RJ-45_1 "POE POWER". Brief section 6.2 (p. 9): two 2.5G ports, one supporting PoE with an additional
+      module. Matches the claim. Contrary search: the chip symbol on both sheets also prints "(RTL8111K)"
+      as an alternative part name; that is a gigabit part, but the brief states two 2.5G ports and
+      the claim follows the populated 2.5G design; the BOM was not read, so the fitted part number
+      on a given board is not independently confirmed.'
+    contrary_evidence: found
+    citation_precision: exact
+  netboot-stock-loader:
+    basis: fa4e0a40c907f16c25726d77010383469fb2b338f4c6ca5e98212ead7f3306b2
+    verdict: GAP
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Mode: full reading. Gap fact. TODO (list commands with help, try pci enum, dhcp, pxe get
+      with a cable in each port, and run fastboot over USB and TCP) can observe the claim''s questions
+      on the stock loader''s console. Contrary search: the Radxa NVMe page says an updated SPI bootloader
+      then loads the system from NVMe, which implies PCIe bring-up in that loader, but it is the bootloader
+      installed by rsetup, not shown to be the factory loader, and says nothing of the network port;
+      the claim stands. Advisory: the TODO text states ''the stock loader is a 2017.09-based build''
+      as fact; it rests on the medium-confidence inference #stock-loader-is-2017-vendor-build and
+      is not a declared dependency, so hedge it (''probably'') or relate it. Contrary evidence for
+      a supported value was not checked because there is none. Citation precision is imprecise because
+      nothing is cited.'
+    contrary_evidence: not-checked
+    citation_precision: imprecise
+  stock-loader:
+    basis: 83487c9fa8f98cf29c7e5a32c803d952457b44c6f528e579b8527109e15a5fdd
+    verdict: PASS
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Mode: full reading. Radxa shared U-Boot page (Build U-Boot): the profile table lists rock-5b
+      and rock-5t both as rk2410, the text says the example uses ROCK 5B and profile rk2410, and the
+      example package is u-boot-rk2410_2017.09-999_arm64.deb. Wrapper page (U-boot Development) imports
+      the shared page with model ''Radxa ROCK 5T'', profile ''rknext'', product ''rock-5t''. The shared
+      page never reads those properties (no props reference), and neither page explains rknext, as
+      the claim says. Searched both pages for any other loader statement; none. Outside the declared
+      sources, Radxa''s BSP repository lists rock-5t among the rk2410 targets (read at branch head,
+      not at a declared pin, not used for the verdict). The TODO (read the banner on a factory-flashed
+      board) can settle what the claim leaves open.'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: PASS
+      date: 2026-10-09
+      note: 'FULL reading. radxa-docs common/dev/_u-boot.mdx at 35413cf, heading Build U-Boot: the
+        profile table lists rock-5t and rock-5b as rk2410; the worked example (rock-5b) produces u-boot-rk2410_2017.09-999_arm64.deb.
+        Wrapper rock5/rock5t/low-level-dev/u-boot.md, heading U-boot Development, passes profile="rknext";
+        the shared page uses no props. Neither page explains the difference. Contrary search: radxa-repo/bsp
+        main (unpinned, 8296ccd2, context only) has u-boot/rk2410/fork.conf listing rock-5t with branch
+        next-dev-v2024.10 and no u-boot/rknext profile, which agrees with the rk2410 reading; none-found
+        against it. Citation exact. Should-fix: the title states as settled the thing the claim hedges;
+        consider "Radxa''s U-Boot page lists the ROCK 5T under rk2410".'
+  stock-loader-is-2017-vendor-build:
+    basis: ba4a9c7339107dedde7507a8ed28590a4493ff8aaf3ea9a87941056d29f93c1e
+    verdict: PASS
+    date: '2026-10-09'
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
+    note: 'Mode: full reading. Inference with medium confidence; premises are #stock-loader (rock-5t
+      row rk2410 profile, package name with 2017.09) and the declared assumption shipped-loader-is-bsp-build,
+      which has its own hardware TODO. The derivation holds: if the shipped loader is the rk2410 build,
+      its version field 2017.09 names a 2017.09 base and it is not mainline, and the wrapper''s rknext
+      profile is disclosed as weakening the premise. Contrary search: the document pair gives no other
+      loader statement; outside the declared sources, the rk2410 profile''s fork configuration names
+      a Radxa vendor U-Boot branch whose name carries v2024.10 but whose Makefile reads VERSION 2017,
+      PATCHLEVEL 09 (branch head, not a pin), so that branch label does not contradict a 2017.09 base.
+      The claim is stated without ''if'', but the assumption is declared via assumes and the confidence
+      is scoped. The TODO (version banner) can identify the base version; it does not need to identify
+      the whole build.'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r2-second
+      verdict: PASS
+      date: 2026-10-09
+      note: 'FULL reading. Inference, medium confidence. Premises: #stock-loader (rk2410 row, 2017.09
+        package name; verified above) and the declared assumption shipped-loader-is-bsp-build. The
+        derivation (package version names the U-Boot base) is reasonable and conditional on the assumption,
+        and it states the rknext weakness. Contrary search: the GPL overlay''s pinned radxa/u-boot
+        (39cd993, branch next-dev-v2024.10) Makefile lines 5-6 give VERSION 2017, PATCHLEVEL 09, consistent;
+        none-found. The banner TODO can settle it. Citation exact.'
+  debug-console-is-uart2-m0:
+    basis: 1febfa371e03ba19a8e6269bca4ba2e250969cb620d8993825fa9ebd59f5c0b7
+    verdict: PASS
+    date: 2026-10-09
+    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r3-primary
+    note: 'FULL reading. Schematic V1.2 (sha256 matched the declared 8214...4491) sheet 36 of 36 (40pin/LED/RTC/EEPROM):
+      CON1 pin 8 goes through R442 100R to UART2_TX_M0 and pin 10 through R443 100R to UART2_RX_M0.
+      Sheet 6 (not cited) names the SoC pads P29 GPIO0_B5_d and R29 GPIO0_B6_d as UART2_TX_M0 and
+      UART2_RX_M0. Product brief 1.4 (sha256 matched) section 6.1.1, printed page 8, header table:
+      pin 8 GPIO0_B5 UART2_TX_M0, pin 10 GPIO0_B6 UART2_RX_M0. The ''So the console is UART2 with
+      M0 multiplexing'' step is a direct reading of the M0 net names, not a hidden derivation. Declared
+      relation to #debug-console (pins 8, 10 and TX/RX roles) agrees with the schematic. Searched
+      for any other UART2 mapping on the header or a second route to the pins: UART2_TX_M1 and UART2_TX_M2
+      appear on sheets for other pads (SDMMC and camera) and neither reaches CON1; no not-fitted option
+      found on R442 or R443.'
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: Claude Code, claude-opus-5-5, reader rock5t-r3-second
+      verdict: PASS
+      date: 2026-10-09
+      note: 'FULL reading. Both documents fetched from their canonical URLs; sha256 matches the declared
+        values. Schematic V1.2 sheet 36 (40pin/LED/RTC/EEPROM): CON1 pin 8 runs through R442 100R
+        to net UART2_TX_M0 and pin 10 through R443 100R to net UART2_RX_M0 (read from the drawing,
+        not only the text layer). Product brief section 6.1.1, printed page 8: pin 8 is GPIO0_B5 with
+        function UART2_TX_M0, pin 10 is GPIO0_B6 with UART2_RX_M0. The conclusion that the console
+        is UART2 M0 rests on #debug-console (pins 8 and 10 are the console), now declared by the relates
+        entry. Contrary-evidence search: every schematic sheet''s text for UART2 nets and GPIO0_B5/B6.
+        Sheet 6 ties ball GPIO0_B5_d/GPIO0_B6_d to nets UART2_TX_M0/UART2_RX_M0, consistent; the UART2
+        M1 functions on sheet 9 carry SDMMC0 nets and the M2 functions on sheet 14 are not routed
+        as UART2; none found. Citation precision exact (sheet 6 could be added to tie the net to the
+        ball within the schematic itself, optional).'
