@@ -9,6 +9,17 @@ not_triggers: [rk3588s, rk3576, rk3568]
 cache: rock5t-resources
 instances: []
 resources:
+  repos:
+    - name: scratch-gpl-src
+      url: https://github.com/raspberrypi/tools
+      commit: 439b6198a9b340de5998dd14a26a0d9d38a6bcac
+      license: GPL-2.0-only
+      role: source
+      files:
+        - {path: armstubs/armstub8.S, license_from: notice}
+      verified: 2026-10-09
+      fetch: ok
+      fetch_via: git
   documents:
     - name: gic600-trm
       class: databook
@@ -48,6 +59,8 @@ facts:
       - class: databook
         doc: gic600-trm
         at: [{section: "4.1.1", pages: ["4-103", "4-104"], table: "4-1"}]
+      - class: src
+        anchors: [{repo: scratch-gpl-src, path: armstubs/armstub8.S, lines: [53, 57], symbol: OSC_FREQ}]
 
   - id: gic-instance
     section: quick-facts
