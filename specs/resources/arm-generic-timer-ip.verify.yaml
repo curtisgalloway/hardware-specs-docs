@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+
+format: 2
+spec: arm-generic-timer-ip
+spec_file: arm-generic-timer-ip.spec.yaml
+canonical: fact-v1
+sources:
+- name: arm-generic-timer-102379-0104.pdf
+  url: https://developer.arm.com/documentation/102379/latest
+  sha256: c8fb557a14970b8302e2f12560fc9038d650da9aaaf97d4bb85327bfa401e82c
+  fetch: ok
+verdicts:
+  architecture-identity:
+    basis: cfef9703d2cc30786ce7c9b200c286bb842a04de9000fdc953d6e98f1dbfd0bb
+    verdict: PASS
+    date: '2026-10-11'
+    verifier: GPT-6.1 Sol / Codex / verify_m7_primary_clean
+    contrary_evidence: none-found
+    citation_precision: exact
+    note: Public Arm document bytes match their declared SHA-256. Timer printed pp8-10 describe common
+      System Counter, per-core comparators and always-present EL1 timers; p22 bounds external MMIO timers.
+      GIC PDF pp32,37,48 support distributor SPI routing, redistributor SGI/PPI configuration, affinity
+      routing/system-register enable and one PE per CPU interface. Adjacent timer optional EL2/EL3 rows
+      and GIC legacy/asymmetric routing qualification do not contradict the deliberately bounded identities.
+    readers:
+    - verifier: GPT-6.1 Sol / Codex / verify_m7_second_clean
+      verdict: PASS
+      date: '2026-10-11'
+      note: Read the pinned public architecture passages and adjacent conditional/legacy alternatives.
+        The identity specifies an interface, not measured RK3588 silicon or firmware. Generic Timer pages8–10
+        establish common counter, comparators and always-present EL1 physical/virtual timers; p22 distinguishes
+        external MMIO frames. GIC pages32/37/48 establish SPI distribution, SGI/PPI redistributors, AArch64
+        affinity/system-register routing and one PE per CPU interface. For GIC, add p49 or section12.1
+        for a tighter explicit CPU-register-interface locator.
+spec_sha256: 7f86c27a3958269fd5b83ab69328606db6e1d891191b99505f729ab2f54fc3d1
+summary:
+  pass: 1
+  fail: 0
+  unverifiable: 0
+  gap: 0
+  adjudicate: 0
