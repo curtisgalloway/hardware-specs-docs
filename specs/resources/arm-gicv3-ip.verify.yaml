@@ -1,0 +1,40 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+
+format: 2
+spec: arm-gicv3-ip
+spec_file: arm-gicv3-ip.spec.yaml
+canonical: fact-v1
+sources:
+- name: arm-ihi0069g.pdf
+  url: https://developer.arm.com/documentation/ihi0069/latest
+  sha256: f5461ced0b908141c87f655e602ff6340a90f14028ea009239c388ed69b78ac6
+  fetch: ok
+verdicts:
+  architecture-identity:
+    basis: 01f1c048c2972bfcc25caf1713a29f56fd66fb2f0f0ccb2d1ae9cdc2b7a1a9a5
+    verdict: PASS
+    date: '2026-10-11'
+    verifier: GPT-6.1 Sol / Codex / verify_m7_primary_clean corrected
+    note: Reread GIC PDF pp32,37,48 and newly added49; document hash f5461ced0b908141c87f655e602ff6340a90f14028ea009239c388ed69b78ac6
+      matches. Page49 identifies ICC_HPPIR/RPR/IAR system-register interface and scopes acknowledgement
+      by group/security/priority/EL. Prior pages support SPI distributor, SGI/PPI redistributor, affinity
+      and one PE per CPU interface. Legacy/asymmetric alternative and group-access restrictions do not
+      contradict the bounded architecture identity. No RK3588 hardware/firmware state inferred.
+    contrary_evidence: none-found
+    citation_precision: exact
+    readers:
+    - verifier: GPT-6.1 Sol / Codex / verify_m7_second_clean / corrected round
+      verdict: PASS
+      date: '2026-10-11'
+      note: Pinned public GIC manual hash matches. Pages32,37,48,49 support Distributor SPI routing, Redistributor
+        SGI/PPI configuration, AArch64 affinity routing/system-register interface and one PE per CPU interface.
+        Page49 explicitly names ICC_HPPIR0/1_EL1, ICC_RPR_EL1 and ICC_IAR0/1_EL1, with group/security/priority/exception-level
+        qualifications. No product revision or installed board access state inferred. Locator exact.
+spec_sha256: 2ff6fff2c2b6e6a6d31f884079e7550359c06a88cf8f91a1de21c341de5f88a1
+summary:
+  pass: 1
+  fail: 0
+  unverifiable: 0
+  gap: 0
+  adjudicate: 0

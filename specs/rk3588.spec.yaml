@@ -214,3 +214,18 @@ facts:
         settles the version and that the SMC conduit works, not that HVC is refused. To settle the
         conduit, also call PSCI_FEATURES and attempt PSCI_VERSION with HVC from EL1, and read the
         method property of the device tree the firmware passes.
+  - id: boot-instance-document-coverage
+    section: quick-facts
+    title: Boot instance evidence boundary
+    claim: The documents-only SoC map does not establish applicable UART2, GIC, architectural timer,
+      clock/reset, pin-control or GPIO instance placements. Its instances list remains empty. Architecture
+      identities describe interfaces and do not identify RK3588 silicon or firmware state.
+    todo:
+      check: document
+      text: Obtain admissible public RK3588 instance-placement and interface-applicability documents;
+        read the separately licensed source overlays for pinned implementation declarations.
+    relates:
+    - fact: arm-gicv3-ip#architecture-identity
+      relation: qualifies
+    - fact: arm-generic-timer-ip#architecture-identity
+      relation: qualifies

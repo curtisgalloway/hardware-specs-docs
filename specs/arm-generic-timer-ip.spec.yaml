@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+format: 2
+kind: ip
+id: arm-generic-timer-ip
+name: Arm Generic Timer architecture
+triggers:
+- arm-generic-timer-ip
+resources:
+  documents:
+  - name: arm-generic-timer-102379-0104.pdf
+    class: doc
+    title: Learn the architecture - Generic Timer
+    revision: 102379_0104_01_en version 1.4 issue 01
+    url: https://developer.arm.com/documentation/102379/latest
+    retrieval:
+    - url: https://documentation-service.arm.com/static/66c4754f32f35b31ceb317ff
+    sha256: c8fb557a14970b8302e2f12560fc9038d650da9aaaf97d4bb85327bfa401e82c
+    pages: 28
+    page_numbering: printed
+    access: public
+    note: Non-confidential public programming guide. Does not establish CPU extension availability
+      or actual firmware state; no claim cites the rejected retired DDI0608 supplement.
+orientation: >-
+  Terms: EL1 is exception level 1, the processor privilege level normally used by an operating-system kernel. A system register is accessed by processor instructions; MMIO means memory-mapped input/output. See the [hardware glossary](https://github.com/curtisgalloway/hardware-specs-docs/blob/main/GLOSSARY.md).
+facts:
+- id: architecture-identity
+  section: standards
+  title: Arm Generic Timer architecture
+  claim: The Arm Generic Timer architecture provides a common System Counter and per-core comparator
+    timers. EL1 physical and virtual timers are always present. This identity covers the processor
+    timer interface, not external MMIO timer frames.
+  support:
+  - class: doc
+    doc: arm-generic-timer-102379-0104.pdf
+    at:
+    - section: 3 What is the Generic Timer?
+      page: '8'
+  - class: doc
+    doc: arm-generic-timer-102379-0104.pdf
+    at:
+    - section: 3 What is the Generic Timer?
+      page: '9'
+  - class: doc
+    doc: arm-generic-timer-102379-0104.pdf
+    at:
+    - section: 4 The processor timers
+      page: '10'
+  - class: doc
+    doc: arm-generic-timer-102379-0104.pdf
+    at:
+    - section: 6 External timers
+      page: '22'

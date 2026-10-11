@@ -28,7 +28,7 @@ states the repository's license and its *accepts list*, the licenses a cited sou
 The *license gate* is the check that fails a spec citing a source outside that list. A
 *verification record* (`specs/resources/<name>.verify.yaml`) holds a verdict per fact, with a
 hash of what the verdict was based on, so a changed fact shows as stale. The *views* are
-generated reading copies: a Markdown view and an HTML *viewer*. Full definitions: driver-lab's
+generated reading copies: a Markdown view and an HTML *viewer*. Hardware terms: the local [glossary](GLOSSARY.md). Spec format definitions: driver-lab's
 [glossary](https://github.com/curtisgalloway/driver-lab/blob/main/GLOSSARY.md).
 
 ## The specs

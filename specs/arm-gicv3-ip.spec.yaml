@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+format: 2
+kind: ip
+id: arm-gicv3-ip
+name: GICv3 architecture interface
+triggers:
+- arm-gicv3-ip
+resources:
+  documents:
+  - name: arm-ihi0069g.pdf
+    class: standard
+    title: Arm Generic Interrupt Controller Architecture Specification, GIC architecture version
+      3 and version 4
+    revision: Arm IHI 0069G ID011821
+    url: https://developer.arm.com/documentation/ihi0069/latest
+    retrieval:
+    - url: https://documentation-service.arm.com/static/601412d54ccc190e5e681269
+    sha256: f5461ced0b908141c87f655e602ff6340a90f14028ea009239c388ed69b78ac6
+    pages: 930
+    page_numbering: pdf
+    access: public
+    note: Non-confidential. Arm copyright and proprietary notices remain applicable; document bytes
+      are not redistributed.
+orientation: >-
+  Terms: GIC means Generic Interrupt Controller; SPI/PPI/SGI are shared peripheral, private peripheral and software-generated interrupts; PE means processing element. AArch64 is the Arm 64-bit execution state; a system register is accessed by processor instructions. See the [hardware glossary](https://github.com/curtisgalloway/hardware-specs-docs/blob/main/GLOSSARY.md).
+facts:
+- id: architecture-identity
+  section: standards
+  claim: The bounded programming model is GICv3 with affinity routing and the AArch64 CPU system
+    register interface. Distributor state routes SPIs; redistributors hold SGI/PPI configuration;
+    each CPU interface serves one processing element (PE). This identifies an interface, not a GIC-600
+    product or revision.
+  support:
+  - class: standard
+    doc: arm-ihi0069g.pdf
+    at:
+    - page: '32'
+      section: '2.1'
+  - class: standard
+    doc: arm-ihi0069g.pdf
+    at:
+    - page: '48'
+      section: 4.1.1
+  - class: standard
+    doc: arm-ihi0069g.pdf
+    at:
+    - page: '37'
+      section: 2.3 Affinity routing
+  - class: standard
+    doc: arm-ihi0069g.pdf
+    at:
+    - page: '49'
+      section: '4.1'
+  title: GICv3 architecture interface
