@@ -259,7 +259,7 @@ facts:
           - {heading: TF-A}
           - {heading: TPL}
           - {heading: U-Boot}
-          - {heading: Package the image with U-Boot TPL/SPL}
+          - {heading: 1. Package the image with U-Boot TPL/SPL}
     todo:
       check: source
       text: the contents of `u-boot-rockchip.bin` and the order its stages run are not stated by the page; confirm which stages run and in what order on the console of a mainline boot.
