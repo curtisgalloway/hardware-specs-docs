@@ -22,7 +22,7 @@ permissions:
   contents: read
 env:
   # driver-lab's commit: the same pin as checks.yml's driver-lab checkout; bump both together.
-  TOOL_COMMIT: '6e2b1b5a991b74aa390b63915f75f704b0938eb9'
+  TOOL_COMMIT: 'e80309d57ee2787a7c00ec59567ae5dc7e813206'
   PYTHONDONTWRITEBYTECODE: '1'
 jobs:
   build:
@@ -54,8 +54,9 @@ jobs:
         env:
           SOURCE_COMMIT: ${{ github.sha }}
           VERIFY_POLICY: ${{ github.event_name == 'pull_request' && 'pr' || 'main' }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py build repo/specs --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified "$VERIFY_POLICY"
+          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py build repo/specs --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified "$VERIFY_POLICY" --fetch-anchors
           "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py verify repo/specs --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified "$VERIFY_POLICY"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
