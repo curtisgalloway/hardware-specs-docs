@@ -418,9 +418,10 @@ facts:
   - class: standard
     doc: linux-arm64-booting
     at:
-    - heading: Setup the device tree
-    - heading: Call the kernel image
-    - heading: System registers
+    - heading: 2. Setup the device tree
+    - heading: 4. Call the kernel image
+    - heading: 4. Call the kernel image
+      clause: System registers
   todo:
     check: hardware
     text: |-
@@ -544,7 +545,7 @@ facts:
   - class: doc
     doc: rpi-docs-legacy-config-txt
     at:
-    - heading: enable_gic
+    - heading: enable_gic (Raspberry Pi 4 Only)
 - id: interrupt-ids-at-the-gic
   section: quick-facts
   title: Interrupt IDs at the GIC
@@ -725,7 +726,7 @@ facts:
   - class: doc
     doc: rpi-docs-config-txt
     at:
-    - heading: otg_mode
+    - heading: otg_mode (Raspberry Pi 4 only)
 - id: mini-uart
   section: quick-facts
   title: Mini UART
