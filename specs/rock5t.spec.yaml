@@ -381,7 +381,7 @@ facts:
     support:
       - class: doc
         doc: radxa-docs-maskrom-linux
-        at: [{heading: Enter to Maskrom}]
+        at: [{heading: Linux PC}]
       - class: doc
         doc: radxa-docs-rkdeveloptool
         at:

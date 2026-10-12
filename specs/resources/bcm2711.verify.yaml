@@ -3,7 +3,7 @@
 format: 2
 spec: bcm2711
 spec_file: bcm2711.spec.yaml
-spec_sha256: ef77bf181ff7223e55a4cc8368b5fab70e0864055325d172ce7a8bb0db3d1feb
+spec_sha256: dde240152e39ce50abdf58db9712fe7bc33c82275086c2fdb2167648b4b31459
 canonical: fact-v1
 sources:
 - name: bcm2711-peripherals
@@ -62,6 +62,22 @@ sources:
   fetch: ok
   note: legacy_config_txt/boot.adoc read at the pinned commit via raw fetch (4151 bytes); also config_txt/boot.adoc
     at the same commit, which has no arm_peri_high text.
+- name: gic-400-trm
+  url: https://documentation-service.arm.com/static/5e8f15e27100066a414f7424
+  sha256: 15463e9ac6c82114378b4dc7cee1fb4eaa545f4b5073af4bf8a57d22b9403c52
+  fetch: ok
+  note: curl; sha256 matches declared; 1.1 (1-2), 1.2 (1-4), Table 3-1 (3-3) read
+- name: gicv2-spec
+  url: https://documentation-service.arm.com/static/5f8ff21df86e16515cdbfafe
+  sha256: 7a05a16404e2e1099a456b398d1c9c4e148629b25a455bc22647dbcaeb80abda
+  fetch: ok
+  note: curl; sha256 matches declared; chapter 3 and chapter 4 headings located; only headings checked,
+    not full text
+- name: rpi-docs-config-txt
+  url: https://github.com/raspberrypi/documentation/blob/42deaefbc8b4edfe342b0d759ec16cda3be5e7d8/documentation/asciidoc/computers/config_txt/boot.adoc
+  commit: 42deaefbc8b4edfe342b0d759ec16cda3be5e7d8
+  fetch: ok
+  note: gh api raw; heading "otg_mode (Raspberry Pi 4 only)" present
 summary:
   pass: 35
   fail: 0
@@ -151,73 +167,74 @@ verdicts:
         "firmware" is fair. The TODO asks only for offsets, which the doc does not give. Contrary
         search: the rest of rpi4.rst and config.txt armstub heading; none found.'
   kernel-entry-contract-linux-s-requirements:
-    basis: 68c6ee69f5d119e75617002adeb3ef54f3799da2edd4f4f9cb2e210e5473c88d
+    basis: d60664b13712d56abafa44823da7de4f183d495fd725d2bf21cebf01b5cdcff1
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'x0–x3, DAIF, MMU off, NS
-
-      EL2/EL1, CNTFRQ/CNTVOFF, EL1PCTEN, DTB alignment and size, text_offset/image_size placement,
-      DMA
-
-      quiesce, PoC clean, coherency, same EL, SCR_EL3.FIQ and HCE all match booting.rst "Setup the
-
-      device tree" and "Call the kernel image". booting.rst adds "where available" to EL1PCTEN, which
-
-      changes nothing on a core that implements EL2.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/7 "Kernel entry contract (Linux's requirements)"
-      format: 1
+    date: '2026-10-11'
+    verifier: Claude Code, claude-sonnet-5-5, reader headings-r2-primary
+    note: 'Headings "2. Setup the device tree" and "4. Call the kernel image" exist at the pin as section
+      titles. Section 2: dtb on an 8-byte boundary, at most 2 MB. Section 4: x0 = dtb physical address and
+      x1-x3 = 0; all DAIF masked; non-secure EL2 (RECOMMENDED) or EL1; MMU off; no stale icache entries;
+      image range cleaned to PoC; DMA-capable devices quiesced; CNTFRQ programmed, CNTVOFF consistent, and
+      CNTHCTL_EL2.EL1PCTEN set when entering at EL1; same coherency domain; all CPUs enter at the same exception
+      level; Image at text_offset from a 2MB aligned base with image_size bytes free from the Image start.
+      Clause "System registers" is a bullet label inside section 4 (not a heading): SCR_EL3.FIQ equal across
+      CPUs and unchanged at runtime, SCR_EL3.HCE = 1 for EL2 entry with EL3 present, set by software at
+      a higher exception level. Every part of the claim is supported, including the "not observations of
+      stock firmware" scope statement, which the TODO keeps open. Contrary-evidence search covered the whole
+      of booting.rst at the pin: qualifications (image_size zero with text_offset 0x80000 for pre-v3.17
+      images; DTB placement note for pre-v4.2; traps may be enabled if handled transparently; EL1-only/feature-
+      conditioned register requirements) none contradicts the claim as worded; the claim is scoped to Linux
+      v7.2 text and the generic list. Not searched beyond this document (no errata or other Linux docs).
+      Precision: the three locators cover the dtb, entry state and system-registers parts; the duplicate
+      section-4 locator is redundant but harmless, and the "System registers" clause is findable by its
+      bullet label. Items such as the 8-byte alignment and text_offset placement sit in sections 2 and 4
+      respectively, which are cited. Standard document without pages, so headings suffice.'
+    contrary_evidence: none-found
+    citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-second
+    - verifier: Claude Code, claude-opus-5-5, reader headings-r2-second
       verdict: PASS
-      date: '2026-10-09'
-      note: 'booting.rst at Linux 8d3ae592: "2. Setup the device tree" (8-byte boundary, at most 2
-        MB); "4. Call the kernel image" (Image at text_offset from a 2 MB aligned base, image_size
-        bytes free, DMA quiesced, x0 = DTB physical address, x1-x3 = 0, DAIF masked, non-secure EL2
-        recommended or EL1, MMU off, no stale I-cache entries, cleaned to PoC, CNTFRQ programmed,
-        CNTVOFF consistent, EL1PCTEN on EL1 entry, same coherency domain, SCR_EL3.FIQ consistent and
-        unchanged, SCR_EL3.HCE = 1 for EL2 entry) and the closing paragraph (all CPUs enter at the
-        same exception level). All match; the claim drops "where available" from EL1PCTEN, harmless
-        on the A72. Citation imprecise: "System registers" is a bullet label inside section 4, not
-        a heading; cite section 4 with the bullet names. Contrary search: the rest of booting.rst
-        for exceptions; none found.'
+      date: '2026-10-11'
+      note: 'Fetched Documentation/arch/arm64/booting.rst at linux 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+        (620 lines, sha256 4312d0ef56380dfedd0e2ed0f4375d158e006affbba269877347b0b1b0b55ea0; the document
+        entry pins no sha256, so no hash comparison). spec.py resolve reported 0 anchors resolved, 0 skipped
+        (heading locators are not machine-checked; two unrelated errors for missing pl011-trm and cortex-a72-trm
+        files), so all locators were checked by reading. Heading "2. Setup the device tree" exists and states
+        the 8-byte boundary and 2 MB maximum. Heading "4. Call the kernel image" exists and states: Image
+        at text_offset from a 2MB aligned base with image_size bytes free from the image start; quiesce
+        DMA-capable devices; primary x0 = dtb physical address, x1-x3 = 0; all DAIF masked; non-secure EL2
+        (recommended) or EL1; MMU off, I-cache no stale entries, image cleaned to PoC; CNTFRQ programmed,
+        CNTVOFF consistent on all CPUs, CNTHCTL_EL2.EL1PCTEN set on EL1 entry ("where available", a qualifier
+        the claim drops; harmless on Cortex-A72, which has EL2); all CPUs in the same coherency domain;
+        and, after the System registers clause, that these requirements apply to all CPUs and all CPUs enter
+        at the same exception level. Clause "System registers" exists in section 4 and states the registers
+        are initialised by software at a higher exception level, SCR_EL3.FIQ the same across CPUs and unchanged
+        from boot while the kernel runs, and SCR_EL3.HCE = 1 for EL2 entry with EL3 present. The claim is
+        scoped as Linux''s rules, not firmware observations, which matches the source; the hardware TODO
+        about the stock stub''s handover state is a legitimate open question a hardware check can observe.
+        Contrary-evidence search: read all of booting.rst at the pin (sections 1-4, header notes, version
+        NOTEs for pre-v4.2 dtb and pre-v4.6 image placement, the GICv3/GICv5 and feature-conditional register
+        lists, and the secondary-CPU and enable-method text). None contradicts the claim; the omitted conditional
+        register requirements (GICv3/v5, FEAT_*) are conditional on features and do not make the listed
+        subset wrong, since the claim does not say the list is complete beyond "also asks for".'
   interrupt-controller:
-    basis: da13d9e1480cea6996f3ffa5ac96d99efc469735ab49fc2b5bf831493d820c48
+    basis: a04e73508a21afeadf53987ee30003d084b97f1f993375445c8c2cfe0cfb05c8
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'GIC-400 selected by default and the legacy
-
-      controller selectable from config.txt (§6.1, p. 85; §6.3, p. 89; `enable_gic` on the legacy
-
-      boot options page, default 1). Base 0x4_C004_0000 / 0xFF84_0000 and NUM_CPUS=4, NUM_SPIS=192
-
-      (§6.5.1, p. 92). Distributor +0x1000, CPU interfaces +0x2000–0x3FFF, virtual interface control
-
-      +0x4000–0x5FFF, virtual CPU interfaces +0x6000–0x7FFF (GIC-400 TRM §3.2 Table 3-1, p. 3-3);
-      the
-
-      derived Low Peripheral and full-map addresses are the base plus those offsets. GICv2 compliance
-
-      and the GICv2 Security Extensions are now located at GIC-400 TRM §1.2 "Compliance" (p. 1-4),
-
-      with §1.1 (p. 1-2) naming both extensions. IHI 0048B chapter 3 is "Interrupt Handling and
-
-      Prioritization" and chapter 4 "Programmers'' Model". The earlier missing-locator FAIL is
-
-      resolved.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/11 "Interrupt controller"
-      format: 1
+    date: '2026-10-11'
+    verifier: Claude Code, claude-sonnet-5-5, reader headings-r1-primary
+    note: 'Databook 6.1 (p85) says GIC-400 is default and legacy is selectable by config.txt; 6.3 (p89)
+      says GIC-400 enabled by default; 6.5.1 (p92) gives base 0x4c0040000, 0xff840000 in Low Peripheral
+      mode, NUM_CPUS=4 and NUM_SPIS=192. GIC-400 TRM Table 3-1 (p3-3) gives 0x1000/0x2000-0x3FFF/0x4000-0x5FFF/0x6000-0x7FFF;
+      1.2 (p1-4) says GICv2 Security Extensions. The literal enable_gic=0 comes from the legacy config.txt
+      doc heading. Derived addresses 0xFF84_1000 and 0xFF84_2000 are correct arithmetic. GICv2 handling
+      clause rests on the TRM''s compliance statement and the spec chapter headings, which I located but
+      did not read in full. Contrary-evidence search: Searched the databook for other GIC base or config
+      statements (grep GIC-400, enable_gic, FF84); none conflict. The databook itself never names enable_gic,
+      only ''a setting in config.txt''. Citation precision: Good. Page numbers verified. Databook 6.1 does
+      not name enable_gic; that rests on the legacy config.txt heading. The gicv2-spec ''chapter 3'' / ''chapter
+      4'' locators are whole-chapter.'
+    contrary_evidence: none-found
+    citation_precision: exact
   interrupt-ids-at-the-gic:
     basis: dc2a16810cf2239d29eea67c93c7190b6b9b9fb9858da38d3c89a403b4d102be
     verdict: PASS
@@ -339,24 +356,20 @@ verdicts:
         init_uart_clock: 48000000 default, UART0 only, max baud 1/16 of the clock; init_uart_baud:
         115200. Matches. Contrary search: the UART page and legacy boot options; none found.'
   usb-controllers:
-    basis: bf582b754128810b366a96a73975cdbb13f49bbe5cca47e31a9d8dd50b3cdc33
+    basis: 286448b7b4ad82690b6e4f8c096e45eafcdcfde81a7dc429407f298431f4b11f
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'PCIe-attached USB 3.0 controller on 4B/400, legacy USB
-
-      2.0 on USB-C as a device with `otg_mode=0` default, XHCI host with `otg_mode=1`, no USB 3.0
-
-      controller on CM4 (`otg_mode` section). Consistent with the processor page''s PCIe link to the
-
-      USB ports.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/18 "USB controllers"
-      format: 1
+    date: '2026-10-11'
+    verifier: Claude Code, claude-sonnet-5-5, reader headings-r1-primary
+    note: 'Under ''otg_mode (Raspberry Pi 4 only)'' at the pinned commit, the text says a PCIe-attached
+      USB 3.0 controller drives the main USB ports on Pi 4B and later and Pi 400 and later, the legacy USB
+      2.0 controller serves the USB-C connector as a device (otg_mode=0, default), otg_mode=1 selects an
+      XHCI USB 2.0 controller as host there, and CM4 and earlier have no USB 3.0 controller. ''Not by the
+      SoC'' follows from ''attached using PCIe''; it is an inference, not a quote. Contrary-evidence search:
+      Searched the rest of config_txt/boot.adoc for other otg_mode or USB controller statements; none. Did
+      not check the databook for the XHCI USB 2.0 block beyond noting USB0_XHCI_0 in the ETH_PCIe IRQ table.
+      Citation precision: Good. Single heading locator names the exact section that supports every clause.'
+    contrary_evidence: none-found
+    citation_precision: exact
   mini-uart:
     basis: 2a7519419a3ff9b1391e78c16f9c00299c49b532d73526ecdaa5935da1f24ad2
     verdict: PASS

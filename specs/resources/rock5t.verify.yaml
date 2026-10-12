@@ -3,7 +3,7 @@
 format: 2
 spec: rock5t
 spec_file: rock5t.spec.yaml
-spec_sha256: 6916b736a54029f4674aa006774283c31a6513b6521ae4fca4da51fa884d7bd4
+spec_sha256: e52087864809c1dfc7304a26c326e9eaf0c8c0aed2f5df8347ab49a6619c0b6c
 canonical: fact-v1
 sources:
 - name: rock5t-schematic
@@ -284,25 +284,22 @@ verdicts:
         a Maskrom button. "Skips storage" reads the LEVEL1 row, which lists USB alone. Contrary-evidence
         search: none found. Citation precision exact.'
   maskrom-recovery:
-    basis: cafaa3c5b06fe22853a01c93633049ab1855dc40c600efb92cfa9daba0ae0966
+    basis: 9c9860386e72919e56c81bbdc6ef836e5f8d1d939b3a83c9cb90e53e6dc886dc
     verdict: PASS
-    date: 2026-10-09
-    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-primary-docs-rock5t
-    note: 'ROCK 5T Maskrom page at the pin (rock5/rock5t/low-level-dev/maskrom/linux.md), "Enter to
-      Maskrom" filled by the ROCK 5T steps: remove the microSD card and power, hold the Maskrom button,
-      insert the USB cable into the Type-C port with the other end to the computer, power on. The
-      shared rkdeveloptool page: "Flash Loader" is rkdeveloptool db `<loader>` with loader rk3588_spl_loader_v1.08.111.bin,
-      "Flash System Image" is wl 0 `<image>` after xz -d (uncompressed), "Reboot" is rkdeveloptool
-      rd, and the tip says it cannot select a Maskrom device or the storage medium written to. All
-      match. One wording point: the page says one device and one storage medium are normally connected,
-      and the claim''s "the one storage device it finds" is a fair paraphrase. The page never says
-      "sector"; wl 0 is the begin-sector argument of rkdeveloptool (not shown in the cited pages),
-      so "from sector 0" rests on tool knowledge outside the citation. Contrary search: the page''s
-      "this should normally put it into Maskrom mode" is the only hedge; no conflicting procedure
-      found. To narrow the citation: Cite the rkdeveloptool usage text (wl `<BeginSec>` `<File>`)
-      for the sector meaning, or write ''at address 0 as rkdeveloptool wl numbers it''.'
+    date: '2026-10-11'
+    verifier: Claude Code, claude-sonnet-5-5, reader headings-r1-primary
+    note: 'linux.md under ''Linux PC'' gives the ROCK 5T steps (remove microSD and power, hold Maskrom button,
+      Type-C to host, power on) and loader rk3588_spl_loader_v1.08.111.bin. The shared mdx under ''Using
+      rkdeveloptool'' gives `rkdeveloptool db <loader>`, `wl 0 <image>`, the tip that compressed files are
+      not decompressed, and the tip that neither the Maskrom device nor the storage medium can be selected;
+      under ''Reboot'' gives ''rd''. ''sector 0'' is an inference from ''wl 0'', and ''the one device it
+      finds'' paraphrases the tip that normally only one device and medium are connected. Contrary-evidence
+      search: Read both files in full; no conflicting instruction. The shared page also offers upgrade_tool
+      for multiple devices, outside the claim. Citation precision: Good. The Maskrom steps are in the first
+      doc under ''Linux PC''; the commands are in the second under the two named headings. linux.md is a
+      wrapper that passes children into the shared mdx''s ''Enter to Maskrom'' section.'
     contrary_evidence: none-found
-    citation_precision: imprecise
+    citation_precision: exact
   boot-storage:
     basis: f3a45a0b42a4295bee6ca41c7eabf8a5b13575f48b3bf3c60d6f056b29000250
     verdict: PASS
