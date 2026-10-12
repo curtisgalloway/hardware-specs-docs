@@ -3,7 +3,7 @@
 format: 2
 spec: rock5t
 spec_file: rock5t.spec.yaml
-spec_sha256: e52087864809c1dfc7304a26c326e9eaf0c8c0aed2f5df8347ab49a6619c0b6c
+spec_sha256: 948abb645611eef05d8a9f95b724a770ef9b7440d01ba74867c29376877bfae4
 canonical: fact-v1
 sources:
 - name: rock5t-schematic
@@ -127,20 +127,25 @@ verdicts:
         while busy; the method should drain the transmitter first. Precision imprecise and contrary
         evidence not checked (no citation).
   mainline-boot-chain:
-    basis: abad0a2e6fd2b55c2035c65f3b01d86685dc0874460ccf34ee67ec470dc5e9ca
+    basis: d10254eb75ce4991cde5fb08457785d4c7fe7503f0db732c2b911f02103c6531
     verdict: PASS
-    date: '2026-10-09'
-    verifier: Claude Code, claude-sonnet-5-5, reader rock5t-r2-primary-docs
-    note: 'Mode: full reading. U-Boot Rockchip documentation at the pin: the rk3588 board list contains
-      ''Radxa ROCK 5B/5B+/5T (rock5b-rk3588)''; Building/TF-A says TF-A is required for ARM64 images
-      and to use Rockchip''s BL31 binary from rkbin where TF-A is unavailable (the rk3588 example
-      sets BL31 to an rkbin file); Building/TPL says to use Rockchip''s rkbin DDR binary as ROCKCHIP_TPL
-      where U-Boot lacks DRAM init (the rk3588 example sets it); Flashing, Package the image with
-      U-Boot TPL/SPL, says to dd u-boot-rockchip.bin at seek=64 for SD and to write u-boot-rockchip-spi.bin
-      to offset 0 of SPI flash. The claim''s conditional wording matches. Searched the rest of the
-      page, including the miniloader alternative and the eMMC fastboot section, for qualifications
-      on rk3588; none. TODO (confirm stages on a mainline console) can observe what the page leaves
-      unstated.'
+    date: '2026-10-11'
+    verifier: Claude Code, claude-sonnet-5-5, reader rockchip-heading-primary
+    note: 'All five heading locators exist at the pin exactly as cited: Rockchip boards (line 13), TF-A,
+      TPL and U-Boot (the Building subsections), and 1. Package the image with U-Boot TPL/SPL (line 333).
+      Line 173 of the board table reads "Radxa ROCK 5B/5B+/5T (rock5b-rk3588)", which supports the configuration
+      name. Under TF-A the page says TF-A is required for ARM64 images and that Rockchip''s BL31 binary
+      comes from rkbin where TF-A is not open source; the rk3588 example in the U-Boot section exports an
+      rkbin rk3588_bl31 ELF. Under TPL the page says that where U-Boot cannot initialize DRAM, the rkbin
+      DDR binary is used as ROCKCHIP_TPL. Under the Package heading, the SD Card subsection writes u-boot-rockchip.bin
+      with dd seek=64, and the SPI subsection says to write u-boot-rockchip-spi.bin to offset 0 of SPI flash.
+      One small point: the page says seek=64 and never says "sector"; reading it as sector 64 relies on
+      dd''s default 512-byte block, which is a trivial unit inference. The claim does not assert the stage
+      contents or order of the image, and the existing todo says the page does not state them, which is
+      accurate. Contrary-evidence search covered the whole page, with greps for 5T, rock5, sector, offset,
+      spi and rkbin, plus a read of the Building and Flashing sections and the alternative Rockchip miniloader
+      packaging. Nothing conflicts with the claim; the miniloader path is a separate method that the claim
+      does not cover.'
     contrary_evidence: none-found
     citation_precision: exact
   kernel-entry-contract:
