@@ -78,6 +78,42 @@ sources:
   commit: 42deaefbc8b4edfe342b0d759ec16cda3be5e7d8
   fetch: ok
   note: gh api raw; heading "otg_mode (Raspberry Pi 4 only)" present
+- name: pl011-trm
+  sha256: 9cfe1a296ebe7accd905fb569e4c545ed9ca01d8341603568017319abe7e51e7
+  url: https://developer.arm.com/documentation/ddi0183/latest
+  fetch: ok
+  note: Reused cached input; identity checked. run docs-dir copy; SHA-256 matched the spec pin
+- name: arm-arm
+  sha256: 80d589a4645feba6bdb9d77edfaf04d4394d5d5444a4c41f97cf4fdd20eee3d5
+  url: https://developer.arm.com/documentation/ddi0487/latest
+  fetch: ok
+  note: Reused cached input; identity checked. Hash matched the spec pin (issue M.d); D24.10.1 CNTFRQ_EL0
+    read.
+- name: raspberrypi-documentation
+  commit: 42deaefbc8b4edfe342b0d759ec16cda3be5e7d8
+  url: https://github.com/raspberrypi/documentation
+  fetch: ok
+  note: Reused cached input; identity checked. cached checkout, HEAD equals the pinned commit; read
+    configuration/interfaces.adoc and legacy_config_txt/boot.adoc; searched the whole asciidoc tree
+    for init_uart.
+- name: raspberrypi-firmware
+  commit: c9e615a74d377a7e94ac2140336d1352941ef9a2
+  url: https://github.com/raspberrypi/firmware.wiki.git
+  fetch: ok
+  note: Reused cached input; identity checked. cached fw-wiki checkout, HEAD equals the commit named
+    in the spec; read Mailbox-property-interface.md.
+- name: tf-a
+  commit: 510355478850fb9bb4b064554d3dc2416b8b4b96
+  url: https://github.com/ARM-software/arm-trusted-firmware/blob/510355478850fb9bb4b064554d3dc2416b8b4b96/docs/plat/rpi4.rst
+  fetch: ok
+  note: Reused cached input; identity checked. HEAD equals the pin; docs/plat/rpi4.rst searched for
+    peripheral-mode statements (contrary-evidence search only); none.
+- name: arm-software-arm-trusted-firmware
+  commit: 510355478850fb9bb4b064554d3dc2416b8b4b96
+  url: https://github.com/ARM-software/arm-trusted-firmware/blob/510355478850fb9bb4b064554d3dc2416b8b4b96/docs/plat/rpi4.rst
+  fetch: ok
+  note: Reused cached input; identity checked. cached tf-a checkout at the pin; docs/plat/rpi4.rst
+    grepped for peripheral-mode and armstub statements (contrary-evidence search only)
 summary:
   pass: 35
   fail: 0
@@ -88,107 +124,111 @@ verdicts:
   addressing-model:
     basis: bdb6cd64a8704e9266c360b47346c7b32b863049a2008ccc0204013123814bb9
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: '35-bit and legacy views, full-map Main and ARM Local
-
-      ranges, Low Peripheral ranges, the 0x7Enn→0x4_7Enn/0x0_FEnn translation and UART0 at legacy
-
-      0x7E20_1000 match §1.2.1–1.2.4 (pp. 4–6) and §11.5 (pp. 146–147). The GIC and ARM_LOCAL exceptions
-
-      match §6.5.1–6.5.2 (p. 92).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/1 "Addressing model"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p1
+    note: 'Datasheet 1.2.1 (p4) names the full 35-bit bus and the 32-bit legacy master view and Low
+      Peripheral mode; 1.2.2 (p5) says the full map is seen by large-address masters such as the DMA4
+      engines and by the Arm CPU; p6 gives Main peripherals 0x4_7C00_0000-0x4_7FFF_FFFF, ARM Local
+      0x4_C000_0000-0x4_FFFF_FFFF, and in Low Peripheral mode (enabled by the VPU) for the Arm only
+      0x0_FC00_0000-0x0_FF7F_FFFF and 0x0_FF80_0000-0x0_FFFF_FFFF; 1.2.4 (p6) states the document''s
+      addresses are legacy master addresses and gives the 0x7Enn_nnnn -> 0x4_7Enn_nnnn / 0x0_FEnn_nnnn
+      translation. 6.5.1/6.5.2 (p92) mark GIC-400 and ARM_LOCAL bases as Arm-only, not legacy, addresses.
+      11.5 (pp146-147) gives UART0 at 0x7e201000, which translates to 0x0_FE20_1000. Contrary search:
+      grepped the whole datasheet text for other non-legacy or 0x4_/0xFx peripheral addresses and
+      "ARM-only"; the only hits are the GIC-400 and ARM_LOCAL notes (ARM_LOCAL repeated in a later
+      chapter, consistent). None found. Mechanical resolution skipped all locators (printed page numbering);
+      hashes checked by sha256sum.'
+    contrary_evidence: none-found
+    citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-second
+    - verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-r2
       verdict: PASS
-      date: '2026-10-09'
-      note: 'BCM2711 ARM Peripherals (sha256 matched) 1.2.1 p4 names the Full 35-bit map, the 32-bit
-        Legacy Master view (except large-address masters) and Low Peripheral mode; 1.2.2 p5 says the
-        ARM CPU and DMA4 see the full map; p6 gives Main peripherals 0x4_7C00_0000-0x4_7FFF_FFFF,
-        ARM Local 0x4_C000_0000-0x4_FFFF_FFFF and, when the VPU enables Low Peripheral mode, the ARM-only
-        0x0_FC00_0000-0x0_FF7F_FFFF and 0x0_FF80_0000-0x0_FFFF_FFFF; 1.2.4 p6 states the document''s
-        addresses are legacy and gives the 0x7Enn_nnnn -> 0x4_7Enn_nnnn / 0x0_FEnn_nnnn translation;
-        6.5.1-6.5.2 p92 except GIC-400 and ARM_LOCAL as ARM-only; 11.5 p147 lists UART0 at 0x7e201000.
-        Every value matches. Contrary search: Figure 1 p5 and chapters 4 and 6 for any other ARM-only
-        or non-legacy address; none found.'
+      date: '2026-10-14'
+      note: 'Datasheet 1.2.1 (p.4) names a Full 35-bit bus and a 32-bit Legacy Master view seen by
+        peripherals except large-address masters; 1.2.2 (p.5) says the full map is seen by large-address
+        masters such as DMA4 and by the ARM CPU; 1.2.3 (p.6) gives Main 0x4_7C00_0000-0x4_7FFF_FFFF
+        and ARM Local 0x4_C000_0000-0x4_FFFF_FFFF, and in Low Peripheral mode (enabled by the VPU)
+        the ARM only sees Main at 0x0_FC00_0000-0x0_FF7F_FFFF and ARM Local at 0x0_FF80_0000-0x0_FFFF_FFFF;
+        1.2.4 (p.6) says document addresses are legacy and gives the 0x7Enn_nnnn -> 0x4_7Enn_nnnn
+        / 0x0_FEnn_nnnn translation. 6.5.1/6.5.2 (p.92) state GIC-400 and ARM_LOCAL bases are ARM-only,
+        not legacy. 11.5 (p.147) lists UART0 at 0x7e201000. "The other DMA masters" paraphrases the
+        datasheet''s "peripherals (except large address masters)" together with 1.2.4''s rule that
+        DMA engines use legacy addresses; acceptable. pages [4,6] is a range and covers 1.2.1-1.2.4.
+        Contrary search: grepped the whole PDF text for every hex address outside the 0x7C-0x7F legacy
+        window and for "ARM-only"/"not a legacy"; only the GIC-400 and ARM_LOCAL bases (and figure/RAM-window
+        values) appeared, so no further non-legacy peripheral address was found.'
   dma-view-of-memory:
     basis: 29fa21399883ab4175a334a830594aac519a8f69f57c5a501ad8cb48bd328df1
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'legacy RAM window 0xC000_0000–0xFFFF_FFFF, movable
-
-      with PAGE/PAGELITE, fixed L2 aliases at 0x0 and 0x8000_0000 limited to the first 1 GB, and
-
-      peripherals at 0x7C00_0000–0x7FFF_FFFF (§1.2.4, p. 6). ENABLE.PAGE 27:24 (DMA0–6) and PAGELITE
-
-      31:28 (DMA7–10) (Table 62, p. 60). DMA4 bypasses paging (§4.6, p. 64). Channel 15 at 0x7EE0_5000,
-
-      VPU-only (§4.2, p. 31).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/4 "DMA view of memory"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p1
+    note: '1.2.4 (p6): DMA access to RAM uses legacy 0xC000_0000-0xFFFF_FFFF, a 1 GB window movable
+      with PAGE/PAGELITE; L2 aliases at 0x0000_0000 (allocating) and 0x8000_0000 (non-allocating)
+      are fixed and limited to the first 1 GB; Main peripherals at 0x7C00_0000-0x7FFF_FFFF. Table
+      62 (p60): ENABLE.PAGELITE bits 31:28 for DMA Lite DMA7-10, PAGE bits 27:24 for the 30-bit engines
+      DMA0-6, one field each (per group). 4.6 (p64): DMA4 engines access the full 35-bit bus and bypass
+      the paging registers. 4.2 (p31): channel 15 at 0x7ee05000, physically apart, used exclusively
+      by the VPU. Contrary search: chapter 4 overview (16 channels, 4 Lite, 4 DMA4), DMA Lite register
+      map (channels 7-10 labeled Lite), and 4.1''s note that DMA uses legacy peripheral addresses;
+      consistent, none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   stub-load-and-hand-off-words:
     basis: 7c849b6f710f2e0c4e72f86c1e60e925a23b24689c489eb61be8c659e71a6ff3
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'load to address 0, AArch64 EL3, magic value
-
-      causing the kernel and DTB load addresses to be written near the start of memory: TF-A rpi4.rst
-
-      "TF-A port design".'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/6 "Stub load and hand-off words"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p1
+    note: 'tfa-rpi4 at the pin, section "TF-A port design": if armstub8.bin is found or armstub= names
+      a file, it is loaded to the beginning of DRAM (address 0) and executed in AArch64 EL3; the kernel
+      and device tree are loaded first, and if the GPU firmware finds a magic value in the armstub
+      image it puts the two load addresses in memory locations near the beginning of memory where
+      TF-A picks them up. The claim matches this in scope; it avoids TF-A''s naming of bootcode.bin
+      as the loader. Contrary search: pinned rpi-docs config_txt/boot.adoc `armstub` (default stub
+      is in firmware, armstub names a file on the boot partition) and legacy_config_txt/boot.adoc
+      (kernel_address/kernel_old and the arm_peri_high note); no conflict, though no Raspberry Pi
+      document at the pin restates the default armstub8.bin filename or the EL3 entry, so those rest
+      on the TF-A document alone (a third-party doc). TODO (hardware) for the word offsets is observable
+      by a stub that dumps low memory; it covers only the unsupported offsets, not the supported part.'
+    contrary_evidence: none-found
+    citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-second
+    - verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-r2
       verdict: PASS
-      date: '2026-10-09'
-      note: 'TF-A docs/plat/rpi4.rst at 51035547, "TF-A port design": armstub8.bin or the armstub=
-        file is loaded to the beginning of DRAM (address 0) and executed in AArch64 EL3; if the GPU
-        firmware finds a magic value in the image it puts the kernel and DTB load addresses in memory
-        locations near the beginning of memory where the stub picks them up. Matches. The document
-        attributes the loading to bootcode.bin, which on Pi 4 is the EEPROM boot code; the claim''s
-        "firmware" is fair. The TODO asks only for offsets, which the doc does not give. Contrary
-        search: the rest of rpi4.rst and config.txt armstub heading; none found.'
+      date: '2026-10-14'
+      note: 'tfa-rpi4 at the pin, heading "TF-A port design": bootcode.bin loads armstub8.bin, or
+        the file named by armstub=, to the beginning of DRAM (address 0) and executes it in AArch64
+        EL3; it also loads a kernel and device tree, and if the GPU firmware finds a magic value in
+        the armstub image it puts those two load addresses in memory locations near the beginning
+        of memory, where TF-A picks them up. The claim''s "where the stub reads them" generalizes
+        TF-A to the stub role, which the passage describes TF-A as occupying. Contrary search: rpi-docs
+        config_txt/boot.adoc "armstub" (default stub is built into firmware and selected automatically;
+        consistent, the claim is scoped to a stub file) and legacy boot.adoc kernel_address/kernel_old
+        (load addresses only); nothing conflicting. The TODO (offsets of the words, by hardware) is
+        a feasible check: memory near 0 can be inspected after the firmware hands off; it is not performed.'
   kernel-entry-contract-linux-s-requirements:
     basis: d60664b13712d56abafa44823da7de4f183d495fd725d2bf21cebf01b5cdcff1
     verdict: PASS
     date: '2026-10-11'
     verifier: Claude Code, claude-sonnet-5-5, reader headings-r2-primary
-    note: 'Headings "2. Setup the device tree" and "4. Call the kernel image" exist at the pin as section
-      titles. Section 2: dtb on an 8-byte boundary, at most 2 MB. Section 4: x0 = dtb physical address and
-      x1-x3 = 0; all DAIF masked; non-secure EL2 (RECOMMENDED) or EL1; MMU off; no stale icache entries;
-      image range cleaned to PoC; DMA-capable devices quiesced; CNTFRQ programmed, CNTVOFF consistent, and
-      CNTHCTL_EL2.EL1PCTEN set when entering at EL1; same coherency domain; all CPUs enter at the same exception
-      level; Image at text_offset from a 2MB aligned base with image_size bytes free from the Image start.
-      Clause "System registers" is a bullet label inside section 4 (not a heading): SCR_EL3.FIQ equal across
-      CPUs and unchanged at runtime, SCR_EL3.HCE = 1 for EL2 entry with EL3 present, set by software at
-      a higher exception level. Every part of the claim is supported, including the "not observations of
-      stock firmware" scope statement, which the TODO keeps open. Contrary-evidence search covered the whole
-      of booting.rst at the pin: qualifications (image_size zero with text_offset 0x80000 for pre-v3.17
-      images; DTB placement note for pre-v4.2; traps may be enabled if handled transparently; EL1-only/feature-
-      conditioned register requirements) none contradicts the claim as worded; the claim is scoped to Linux
-      v7.2 text and the generic list. Not searched beyond this document (no errata or other Linux docs).
+    note: 'Headings "2. Setup the device tree" and "4. Call the kernel image" exist at the pin as
+      section titles. Section 2: dtb on an 8-byte boundary, at most 2 MB. Section 4: x0 = dtb physical
+      address and x1-x3 = 0; all DAIF masked; non-secure EL2 (RECOMMENDED) or EL1; MMU off; no stale
+      icache entries; image range cleaned to PoC; DMA-capable devices quiesced; CNTFRQ programmed,
+      CNTVOFF consistent, and CNTHCTL_EL2.EL1PCTEN set when entering at EL1; same coherency domain;
+      all CPUs enter at the same exception level; Image at text_offset from a 2MB aligned base with
+      image_size bytes free from the Image start. Clause "System registers" is a bullet label inside
+      section 4 (not a heading): SCR_EL3.FIQ equal across CPUs and unchanged at runtime, SCR_EL3.HCE
+      = 1 for EL2 entry with EL3 present, set by software at a higher exception level. Every part
+      of the claim is supported, including the "not observations of stock firmware" scope statement,
+      which the TODO keeps open. Contrary-evidence search covered the whole of booting.rst at the
+      pin: qualifications (image_size zero with text_offset 0x80000 for pre-v3.17 images; DTB placement
+      note for pre-v4.2; traps may be enabled if handled transparently; EL1-only/feature- conditioned
+      register requirements) none contradicts the claim as worded; the claim is scoped to Linux v7.2
+      text and the generic list. Not searched beyond this document (no errata or other Linux docs).
       Precision: the three locators cover the dtb, entry state and system-registers parts; the duplicate
-      section-4 locator is redundant but harmless, and the "System registers" clause is findable by its
-      bullet label. Items such as the 8-byte alignment and text_offset placement sit in sections 2 and 4
-      respectively, which are cited. Standard document without pages, so headings suffice.'
+      section-4 locator is redundant but harmless, and the "System registers" clause is findable by
+      its bullet label. Items such as the 8-byte alignment and text_offset placement sit in sections
+      2 and 4 respectively, which are cited. Standard document without pages, so headings suffice.'
     contrary_evidence: none-found
     citation_precision: exact
     readers:
@@ -197,449 +237,482 @@ verdicts:
       date: '2026-10-11'
       note: 'Fetched Documentation/arch/arm64/booting.rst at linux 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
         (620 lines, sha256 4312d0ef56380dfedd0e2ed0f4375d158e006affbba269877347b0b1b0b55ea0; the document
-        entry pins no sha256, so no hash comparison). spec.py resolve reported 0 anchors resolved, 0 skipped
-        (heading locators are not machine-checked; two unrelated errors for missing pl011-trm and cortex-a72-trm
-        files), so all locators were checked by reading. Heading "2. Setup the device tree" exists and states
-        the 8-byte boundary and 2 MB maximum. Heading "4. Call the kernel image" exists and states: Image
-        at text_offset from a 2MB aligned base with image_size bytes free from the image start; quiesce
-        DMA-capable devices; primary x0 = dtb physical address, x1-x3 = 0; all DAIF masked; non-secure EL2
-        (recommended) or EL1; MMU off, I-cache no stale entries, image cleaned to PoC; CNTFRQ programmed,
-        CNTVOFF consistent on all CPUs, CNTHCTL_EL2.EL1PCTEN set on EL1 entry ("where available", a qualifier
-        the claim drops; harmless on Cortex-A72, which has EL2); all CPUs in the same coherency domain;
-        and, after the System registers clause, that these requirements apply to all CPUs and all CPUs enter
-        at the same exception level. Clause "System registers" exists in section 4 and states the registers
-        are initialised by software at a higher exception level, SCR_EL3.FIQ the same across CPUs and unchanged
-        from boot while the kernel runs, and SCR_EL3.HCE = 1 for EL2 entry with EL3 present. The claim is
-        scoped as Linux''s rules, not firmware observations, which matches the source; the hardware TODO
-        about the stock stub''s handover state is a legitimate open question a hardware check can observe.
-        Contrary-evidence search: read all of booting.rst at the pin (sections 1-4, header notes, version
-        NOTEs for pre-v4.2 dtb and pre-v4.6 image placement, the GICv3/GICv5 and feature-conditional register
-        lists, and the secondary-CPU and enable-method text). None contradicts the claim; the omitted conditional
-        register requirements (GICv3/v5, FEAT_*) are conditional on features and do not make the listed
-        subset wrong, since the claim does not say the list is complete beyond "also asks for".'
+        entry pins no sha256, so no hash comparison). spec.py resolve reported 0 anchors resolved,
+        0 skipped (heading locators are not machine-checked; two unrelated errors for missing pl011-trm
+        and cortex-a72-trm files), so all locators were checked by reading. Heading "2. Setup the
+        device tree" exists and states the 8-byte boundary and 2 MB maximum. Heading "4. Call the
+        kernel image" exists and states: Image at text_offset from a 2MB aligned base with image_size
+        bytes free from the image start; quiesce DMA-capable devices; primary x0 = dtb physical address,
+        x1-x3 = 0; all DAIF masked; non-secure EL2 (recommended) or EL1; MMU off, I-cache no stale
+        entries, image cleaned to PoC; CNTFRQ programmed, CNTVOFF consistent on all CPUs, CNTHCTL_EL2.EL1PCTEN
+        set on EL1 entry ("where available", a qualifier the claim drops; harmless on Cortex-A72,
+        which has EL2); all CPUs in the same coherency domain; and, after the System registers clause,
+        that these requirements apply to all CPUs and all CPUs enter at the same exception level.
+        Clause "System registers" exists in section 4 and states the registers are initialised by
+        software at a higher exception level, SCR_EL3.FIQ the same across CPUs and unchanged from
+        boot while the kernel runs, and SCR_EL3.HCE = 1 for EL2 entry with EL3 present. The claim
+        is scoped as Linux''s rules, not firmware observations, which matches the source; the hardware
+        TODO about the stock stub''s handover state is a legitimate open question a hardware check
+        can observe. Contrary-evidence search: read all of booting.rst at the pin (sections 1-4, header
+        notes, version NOTEs for pre-v4.2 dtb and pre-v4.6 image placement, the GICv3/GICv5 and feature-conditional
+        register lists, and the secondary-CPU and enable-method text). None contradicts the claim;
+        the omitted conditional register requirements (GICv3/v5, FEAT_*) are conditional on features
+        and do not make the listed subset wrong, since the claim does not say the list is complete
+        beyond "also asks for".'
   interrupt-controller:
     basis: a04e73508a21afeadf53987ee30003d084b97f1f993375445c8c2cfe0cfb05c8
     verdict: PASS
     date: '2026-10-11'
     verifier: Claude Code, claude-sonnet-5-5, reader headings-r1-primary
-    note: 'Databook 6.1 (p85) says GIC-400 is default and legacy is selectable by config.txt; 6.3 (p89)
-      says GIC-400 enabled by default; 6.5.1 (p92) gives base 0x4c0040000, 0xff840000 in Low Peripheral
-      mode, NUM_CPUS=4 and NUM_SPIS=192. GIC-400 TRM Table 3-1 (p3-3) gives 0x1000/0x2000-0x3FFF/0x4000-0x5FFF/0x6000-0x7FFF;
+    note: 'Databook 6.1 (p85) says GIC-400 is default and legacy is selectable by config.txt; 6.3
+      (p89) says GIC-400 enabled by default; 6.5.1 (p92) gives base 0x4c0040000, 0xff840000 in Low
+      Peripheral mode, NUM_CPUS=4 and NUM_SPIS=192. GIC-400 TRM Table 3-1 (p3-3) gives 0x1000/0x2000-0x3FFF/0x4000-0x5FFF/0x6000-0x7FFF;
       1.2 (p1-4) says GICv2 Security Extensions. The literal enable_gic=0 comes from the legacy config.txt
       doc heading. Derived addresses 0xFF84_1000 and 0xFF84_2000 are correct arithmetic. GICv2 handling
-      clause rests on the TRM''s compliance statement and the spec chapter headings, which I located but
-      did not read in full. Contrary-evidence search: Searched the databook for other GIC base or config
-      statements (grep GIC-400, enable_gic, FF84); none conflict. The databook itself never names enable_gic,
-      only ''a setting in config.txt''. Citation precision: Good. Page numbers verified. Databook 6.1 does
-      not name enable_gic; that rests on the legacy config.txt heading. The gicv2-spec ''chapter 3'' / ''chapter
-      4'' locators are whole-chapter.'
+      clause rests on the TRM''s compliance statement and the spec chapter headings, which I located
+      but did not read in full. Contrary-evidence search: Searched the databook for other GIC base
+      or config statements (grep GIC-400, enable_gic, FF84); none conflict. The databook itself never
+      names enable_gic, only ''a setting in config.txt''. Citation precision: Good. Page numbers verified.
+      Databook 6.1 does not name enable_gic; that rests on the legacy config.txt heading. The gicv2-spec
+      ''chapter 3'' / ''chapter 4'' locators are whole-chapter.'
     contrary_evidence: none-found
     citation_precision: exact
   interrupt-ids-at-the-gic:
     basis: dc2a16810cf2239d29eea67c93c7190b6b9b9fb9858da38d3c89a403b4d102be
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'PPI 25–31 sources match GIC-400 TRM §2.3.2
-
-      Table 2-3 and datasheet Figure 7. SPI blocks 32–47, 48–51, 52, 53, 64–79, 96–159 and 160–216
-
-      match Figure 7 (p. 89). AVS, PCIe INTA–D, MSI, GENET A/B and XHCI numbers match Table 103
-
-      (p. 88) plus 160. PPI active-low level and SPI rising-edge/active-high match §2.3.2–2.3.3
-
-      (p. 2-8).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/12 "Interrupt IDs at the GIC"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p1
+    note: 'Figure 7 (p89): PPIs 26 HP timer, 27 V timer, 28 legacy FIQn, 29 PS timer, 30 PNS timer,
+      31 legacy IRQn; SPIs 32-47 ARM mailboxes, 48-51 core 0-3 PMU, 52 AXIERR, 53 local timer, 64-79
+      ARMC, 96-159 VC (64 lines), 160-216 ETH_PCIe L2 (57 lines). Table 103 (p88): AVS 9, PCIE_0 INTA-D
+      15-18, MSI 20, GENET_0_A/B 29/30, USB0_XHCI_0 48, giving 169, 175-178, 180, 189/190, 208 at
+      160+n. GIC-400 TRM Table 2-3 (2.3.2, pp2-7/2-8): ID 25 virtual maintenance interrupt and the
+      same 26-31 sources; 2.3.2 says all PPIs are active-LOW level-sensitive; 2.3.3 (p2-8) says each
+      SPI is configurable rising-edge or active-HIGH level. The 96+n and 160+n mappings follow the
+      figure''s contiguous ranges and line counts. Contrary search: 6.2.1-6.2.5 text, 6.5.1 (NUM_SPIS=192,
+      so ID 216 is in range), 6.2.5 note that ETH_PCIe L2 lines reach only the GIC, not the legacy
+      controller; none found. The 2.3.2 locator has no page but names its table; acceptable.'
+    contrary_evidence: none-found
+    citation_precision: exact
   shared-interrupt-lines:
     basis: 0d068853d588d81ec9fbd65c26cbf94485c3e91d709e1743a29e549176844384
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'VC 57/53/54/29/62 groupings, the 23/24/46 pairs,
-
-      PACTL_CS at 0x7E20_4E00, and Figure 6 routing SPI1/SPI2 through AUX_IRQ to 29 despite Table
-      102''s
-
-      "OR of all SPI" label all match §6.2.4 (pp. 86–88; the figure was checked as an image) and §2.1.
-
-      The GIC IDs follow Figure 7.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/13 "Shared interrupt lines"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p1
+    note: 'Table 102 (pp86-87): 57 OR of all PL011 UART, 53 OR of all I2C, 54 OR of all SPI, 29 AUX,
+      62 EMMC & EMMC2, 23 DMA 7 & 8, 24 DMA 9 & 10, 46 Pixel Valve 1 & 4. Figure 6 (p88, rendered
+      as an image): AUX_IRQ bits 0-2 (UART1, SPI1, SPI2) OR to 29; PACTL_CS SPI0 and SPI3-6 (5 lines)
+      to 54, I2C0-7 to 53, UART0 and UART2-5 to 57; so Table 102''s "all SPI" label is narrower in
+      the figure, as the claim states. 6.2.4 text (p87): statuses for 29, 53, 54, 57 in AUX_IRQ and
+      PACTL_CS at 0x7E20 4E00; for 23, 24, 46, 62 read each peripheral''s status. 2.1 (p8): mini UART,
+      SPI1, SPI2 share one interrupt. GIC IDs 153/149/150/125/158 = 96+n per Figure 7 (p89). Contrary
+      search: chapter 2 overview and 6.2.4-6.2.5 text; none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   debug-uart:
     basis: 69de0394c026e851e2d8833a18d647d2078040af890f8c0a5276fb87c44a3048
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'r1p5 TRM named, base addresses, register offsets, FIFO sizes,
-
-      no IrDA, CTS/RTS only (§11.1, §11.5 Table 172, Table 173 bit table). TXD0/RXD0 on GPIO14/15
-      ALT0
-
-      (Table 171, p. 145). VC 57 / GIC 153 (§6.2.4, Figure 7). Low Peripheral address per §1.2.4.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/14 "Debug UART"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p1
+    note: '11.1 (p144): five PL011s (UART0, 2-5), TRM r1p5 named, IrDA/SIR not supported, 32x8 TX
+      and 32x12 RX FIFOs, only CTS and RTS modem functions. Table 171 (p145): GPIO14/15 ALT0 = TXD0/RXD0.
+      11.5 and Table 172 (pp146-147): bases 0x7e201000/1400/1600/1800/1a00 and offsets DR 0x00, FR
+      0x18, IBRD 0x24, FBRD 0x28, LCRH 0x2c, CR 0x30, IMSC 0x38, ICR 0x44, all at 4-byte spacing;
+      Table 173 (p148) is a 32-bit bit table (DR, bits 31:0). 6.2.4 (p87) VC IRQ 57 OR of all PL011
+      UARTs; Figure 7 (p89) VC base 96 gives 153. 1.2.4 (p6) gives the 0xFE20_1000 Low Peripheral
+      translation. Contrary search: 11.2-11.4 (variations from 16C650, primary I/O says only RXD,
+      nCTS, TXD, nRTS are supported, UART interrupts) and Figure 6; none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-second
+    - verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-r2
       verdict: PASS
-      date: '2026-10-09'
-      note: 'Datasheet 11.1 p144: PL011 per the r1p5 TRM, IrDA unsupported, 32x8 TX and 32x12 RX FIFOs,
-        only CTS/RTS modem lines; 11.5 p147 bases 0x7e201000/1400/1600/1800/1a00 and Table 172 offsets
-        (DR 0x00, FR 0x18, IBRD 0x24, FBRD 0x28, LCRH 0x2c, CR 0x30, IMSC 0x38, ICR 0x44); Table 173
-        p148 32-bit layout; Table 171 p145 GPIO14/15 ALT0 TXD0/RXD0; Table 102 p87 VC IRQ 57 OR of
-        all PL011; Figure 7 p89 VC IRQs at SPI IDs 96-159 (so 153); Figure 6 p88 shows UART0 and UART2-5
-        in 57; 1.2.4 p6 the 0xFE20_1000 translation. Contrary search: chapter 11 and section 6.2;
-        none found.'
+      date: '2026-10-14'
+      note: 'Datasheet 11.1 (p.144): six UARTs, five PL011 (UART0, 2-5), IrDA/SIR not supported, 32x8
+        TX and 32x12 RX FIFOs, only CTS/RTS of the modem lines, r1p5 TRM named. Table 171 (p.145):
+        GPIO14 ALT0 TXD0, GPIO15 ALT0 RXD0. 11.5/Table 172 (pp.146-147): bases 0x7e201000/1400/1600/1800/1a00
+        and offsets DR 0x00, FR 0x18, IBRD 0x24, FBRD 0x28, LCRH 0x2c, CR 0x30, IMSC 0x38, ICR 0x44
+        at 4-byte spacing; Table 173 (p.148) shows 32-bit bit table (31:12 reserved). 6.2.4 Table
+        102 (row 57 on p.87; section heading starts p.86): VC IRQ 57 is OR of all PL011 UART, and
+        Figure 6 shows UART0/2-5 feeding it; 6.3 Figure 7 (p.89): VC peripheral IRQs are GIC SPI IDs
+        96-159, so 57 -> 153 (simple offset, stated by the figure''s ranges). 1.2.4 (p.6) gives the
+        0xFE20_1000 Low Peripheral translation. Contrary search: whole 6.2-6.4 and chapter 11 read
+        for other UART IRQ routes or differing FIFO sizes; none found.'
   pl011-programming-order:
     basis: 4c3f5fc0b4df0977551b0d8ecdcb84487b34c433c9a89d5a7d65d9738c68c815
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'disable before reprogramming (§3.3.1 note,
-
-      p. 3-6). CR sequence (§3.3.8, p. 3-16). IBRD/FBRD latched by the LCR_H write (§3.3.7, p. 3-14).
-
-      Transition-through-level interrupts (§3.3.9, p. 3-17), and no TX interrupt when enabled with
-      an
-
-      empty FIFO (§2.8.3 note, p. 2-23). §2.8.3''s own first bullet, and the BCM2711 datasheet''s
-      §11.4
-
-      copy of it, word the TX interrupt as level-based without the note. The TRM''s note settles this,
-
-      so it is not counted as contrary evidence.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/15 "PL011 programming order"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p1
+    note: 'PL011 TRM r1p5: 3.3.1 note (p3-6) says the UART must be disabled before control registers
+      are reprogrammed and finishes the current character when disabled; 3.3.8 note (p3-16) gives
+      the sequence disable, wait for end of current character, flush TX FIFO by clearing LCR_H.FEN,
+      reprogram CR, enable; 3.3.7 (p3-14) says LCR_H, IBRD and FBRD form one register updated on the
+      LCR_H write, so LCR_H must be written last; 3.3.9 (p3-17) says TX and RX interrupts are generated
+      on a transition through the trigger level, not on the level; 2.8.3 note (p2-23) says enabling
+      the TX interrupt and UART before writing data leaves the interrupt unset. Contrary search: 2.8.2
+      (RX interrupt "reaches" the trigger level, not in conflict with 3.3.9), the BCM2711 datasheet''s
+      11.4 copy of the interrupt text, and 3.3.8''s UARTEN bit description; none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   early-console:
-    basis: 0e3d758066dc4fbedb2a52d2986d8b00827bb5d6459b0ea6cc98559cd050d990
+    basis: bda9d2069310debfad6b72fc440fc943ad3e6ae187e18187a516787a12fe06dc
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'both `earlycon` strings and the 115200 default (UARTs,
-
-      "Enable early console for Linux"). The 48 MHz, UART0-only, at-most-a-sixteenth `init_uart_clock`
-
-      and the 115200 `init_uart_baud` match the legacy boot options.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/17 "Early console"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p4
+    note: 'configuration/interfaces.adoc at 42deaefb, heading "Enable early console for Linux" (lines
+      390-419): the table row "Raspberry Pi 4, 400, Compute Module 4, and 4S" gives earlycon=uart8250,mmio32,0xfe215040
+      and earlycon=pl011,mmio32,0xfe201000; the NOTE maps uart8250 to the mini UART and pl011 to the
+      full PL011 UART; the sentence after the table says the baud rate defaults to 115200 bps. Identifying
+      0xfe201000 as UART0 rests on the declared relation to debug-uart (UART0 at 0xFE20_1000 in Low
+      Peripheral mode), which is consistent; 0xfe215040 is the AUX block plus AUX_MU_IO_REG +0x40,
+      consistent with mini-uart. Both addresses are Low Peripheral mode addresses, which debug-uart''s
+      qualification covers. legacy_config_txt/boot.adoc (top heading "Legacy boot options"): init_uart_baud
+      default 115200; init_uart_clock default 48000000 (48 MHz), applies only to UART0, maximum baud
+      1/16 of the clock. The claim''s attribution to the legacy page, its commit date (2026-10-06)
+      and its refusal to assert these defaults for current firmware all match. Contrary-evidence search:
+      grepped the whole asciidoc tree at the pin for init_uart and earlycon (only the legacy page
+      defines init_uart_*; no other early-console strings for BCM2711) and for 115200 (other hits
+      are bootloader/RP1/console= contexts, none contradicting). The firmware wiki''s "3MHz for UART"
+      is an example of base clocks in the mailbox page, not a statement of BCM2711 UART0''s initial
+      clock, and does not bear on the attributed claim. TODO method check: reading UART0 IBRD/FBRD/LCRH
+      before touching the UART, plus the mailbox clock rate for clock id 2 (UART, listed in the pinned
+      wiki''s clock ids), can observe the firmware-left baud. Advice for the author (not a failure):
+      the pinned wiki says "Get clock rate" returns the last requested value and "Get clock rate measured"
+      returns the actual rate, so name the measured tag; and the terminal confirmation needs UART0
+      on GPIO14/15, which on Pi 4 defaults to the mini UART, so the image should set ALT0 itself rather
+      than adding dtoverlay=disable-bt, which changes the primary UART and may change what the firmware
+      initializes. Headings were checked by hand at the pinned checkout (spec.py resolve skipped all
+      document citations).'
+    contrary_evidence: none-found
+    citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-second
+    - verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-r3
       verdict: PASS
-      date: '2026-10-09'
-      note: 'interfaces.adoc "Enable early console for Linux": for Pi 4, 400, CM4 and 4S, earlycon=uart8250,mmio32,0xfe215040
-        (mini UART) and earlycon=pl011,mmio32,0xfe201000 (PL011), baud defaults to 115200. legacy_config_txt/boot.adoc
-        init_uart_clock: 48000000 default, UART0 only, max baud 1/16 of the clock; init_uart_baud:
-        115200. Matches. Contrary search: the UART page and legacy boot options; none found.'
+      date: '2026-10-14'
+      note: 'interfaces.adoc heading "Enable early console for Linux" (lines 390-419): the table row
+        for Raspberry Pi 4, 400, CM4 and 4S gives earlycon=uart8250,mmio32,0xfe215040 and earlycon=pl011,mmio32,0xfe201000;
+        the NOTE says uart8250 is the mini UART and pl011 the full PL011; "The baud rate defaults
+        to 115200 bps." Identifying 0xfe201000 as UART0 rests on the declared debug-uart relation
+        (UART0 at 0xFE20_1000 in Low Peripheral mode), which matches the datasheet''s 1.2.4 translation
+        rule. legacy_config_txt/boot.adoc under "Legacy boot options": init_uart_clock default 48000000,
+        applies only to UART0, max baud 1/16 of the clock; init_uart_baud default 115200. Commit date
+        2026-10-06 confirmed. The claim''s hedge (legacy options, defaults not asserted for current
+        firmware) is accurate. Contrary-evidence search: grepped the whole documentation tree at the
+        pin for earlycon, init_uart, arm_peri_high and peripheral-mode wording; no conflicting address
+        or baud found. One unstated condition: the 0xfe... earlycon addresses are Low Peripheral mode
+        addresses (datasheet 1.2.3-1.2.4, Figure 1); the documentation does not say so either, and
+        debug-uart carries the condition, so this does not falsify the claim. TODO method: reading
+        IBRD/FBRD/LCRH as left by firmware plus the mailbox clock query can observe the firmware''s
+        initial baud and clock, and the host-terminal check confirms it. Should-fix (not blocking):
+        the method does not fix the UART configuration; on Pi 4 UART0 is the Bluetooth UART by default
+        and firmware may leave it unprogrammed unless enable_uart=1 and UART0 is primary (e.g. dtoverlay=disable-bt).
+        That yields an inconclusive reading (IBRD 0), not a false one; the method should state those
+        config.txt lines and treat IBRD=0 as "not initialized".'
   usb-controllers:
     basis: 286448b7b4ad82690b6e4f8c096e45eafcdcfde81a7dc429407f298431f4b11f
     verdict: PASS
     date: '2026-10-11'
     verifier: Claude Code, claude-sonnet-5-5, reader headings-r1-primary
     note: 'Under ''otg_mode (Raspberry Pi 4 only)'' at the pinned commit, the text says a PCIe-attached
-      USB 3.0 controller drives the main USB ports on Pi 4B and later and Pi 400 and later, the legacy USB
-      2.0 controller serves the USB-C connector as a device (otg_mode=0, default), otg_mode=1 selects an
-      XHCI USB 2.0 controller as host there, and CM4 and earlier have no USB 3.0 controller. ''Not by the
-      SoC'' follows from ''attached using PCIe''; it is an inference, not a quote. Contrary-evidence search:
-      Searched the rest of config_txt/boot.adoc for other otg_mode or USB controller statements; none. Did
-      not check the databook for the XHCI USB 2.0 block beyond noting USB0_XHCI_0 in the ETH_PCIe IRQ table.
-      Citation precision: Good. Single heading locator names the exact section that supports every clause.'
+      USB 3.0 controller drives the main USB ports on Pi 4B and later and Pi 400 and later, the legacy
+      USB 2.0 controller serves the USB-C connector as a device (otg_mode=0, default), otg_mode=1
+      selects an XHCI USB 2.0 controller as host there, and CM4 and earlier have no USB 3.0 controller.
+      ''Not by the SoC'' follows from ''attached using PCIe''; it is an inference, not a quote. Contrary-evidence
+      search: Searched the rest of config_txt/boot.adoc for other otg_mode or USB controller statements;
+      none. Did not check the databook for the XHCI USB 2.0 block beyond noting USB0_XHCI_0 in the
+      ETH_PCIe IRQ table. Citation precision: Good. Single heading locator names the exact section
+      that supports every clause.'
     contrary_evidence: none-found
     citation_precision: exact
   mini-uart:
     basis: 2a7519419a3ff9b1391e78c16f9c00299c49b532d73526ecdaa5935da1f24ad2
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'base 0x7E21_5000 shared with SPI1/2, AUX_MU_IO_REG +0x40,
-
-      AUX_ENABLES +0x04 (Table 2, p. 8). Bit 0 gating register access and the immediate-receive
-
-      warning (Table 4 and following text, pp. 9–10; §2.2, p. 10). AUX_MU_CNTL bits 0/1 reset 1
-
-      (Table 13, p. 14). Core-clock dependence ("Mini UART and core frequency").'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/19 "Mini UART"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p2
+    note: 'Datasheet printed p8 (2.1, Table 2): AUX base 0x7e215000 shared by UART1, SPI1, SPI2; AUX_ENABLES
+      +0x04, AUX_MU_IO_REG +0x40. p9-10 (Table 4): bit 0 enables the mini UART, clear "also disables
+      any mini UART register access"; text says it immediately starts receiving and a low UART1_RX
+      gives 0x00 characters, set GPIO first. p10 (2.2) repeats the GPIO-first advice and "Baudrate
+      derived from system clock". p14 Table 13: AUX_MU_CNTL_REG bit 1 transmitter enable, bit 0 receiver
+      enable, both reset 0x1. interfaces.adoc "Mini UART and core frequency": clock derived from the
+      VPU core clock; baud changes with core frequency; fix it (core_freq=250). Contrary search: the
+      rest of chapter 2 (p11 notes a 250 MHz system clock after reset), legacy boot.adoc init_uart_clock
+      (says UART1''s clock is the core VPU clock, consistent); none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   timers:
     basis: fd66431ecb03cad06f565df146435d57e6c9c2dff3524009796266f4ff14bb87
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'core timer IRQs (§6.2.1). ARM_CONTROL bits 7/8 and reset 0
-
-      (Table 105, pp. 92–93). System Timer base, 64-bit counter and four compare channels (§10.1,
-
-      p. 142), VC 0–3 (Table 102). ARM timer base, +0x400 register offsets, variable clock and the
-
-      System Timer advice (§12.1–12.2, Table 192, p. 159). CNTFRQ_EL0 not interpreted by hardware
-
-      (DDI 0487 M.d §D24.10.1).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/20 "Timers"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p2
+    note: 'Datasheet p86 6.2.1: each core raises PS, PNS, HP and V timer interrupts (plus PMU). p89
+      Figure 7: those are PPIs 26, 27, 29, 30; VC peripheral IRQs map to SPI IDs 96-159, so VC IRQ
+      0-3 are GIC 96-99; p86-87 Table 102 lists Timer 0-3 at VC IRQ 0-3 and says they come from the
+      System Timer. p93 Table 105 ARM_CONTROL: bit 8 increment by two (1) or one (0), bit 7 AXI/APB
+      clock (1) or crystal (0), both reset 0x0, driving the cores'' global system counter. p142 10.1:
+      four 32-bit channels, a 64-bit free-running counter, base 0x7e003000. p159 12.1-12.2 Table 192:
+      SP804-based, base 0x7e00b000, LOAD +0x400, VALUE +0x404, CONTROL +0x408, IRQ clear +0x40c; clock
+      derived from the dynamically varying system clock; system timers recommended for accurate timing.
+      p6 1.2.4 gives the 0x7E.. -> 0xFE.. low peripheral mapping, so LOAD at 0xFE00_B400. arm-arm
+      D24.10.1 (p D24-11209): CNTFRQ_EL0 is not interpreted by hardware, supporting the TODO''s framing.
+      TODO method (read ARM_CONTROL, time the counter against an independent reference) can observe
+      the crystal-derived rate; the datasheet search for "crystal"/"oscillator"/MHz values found no
+      crystal frequency, confirming the stated gap. Contrary search: rest of chapters 6, 10 and 12;
+      none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   arm-local-block:
     basis: ac2d1891347d2dd929262e8505da521e8e24a31aff206f4275ee9af87797970c
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'base and Low Peripheral address, control registers,
-
-      IRQ/FIQ_SOURCE at +0x60/+0x70 (Table 104, pp. 92–93). Sixteen mailboxes with MBOX_SET00 at +0x80,
-
-      distinct from the ARMC/VPU mailboxes (§13.1–13.2, p. 163).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/21 "ARM_LOCAL block"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p2
+    note: 'Datasheet p92 6.5.2: ARM_LOCAL base 0x4c0000000 (ARM-only), 0xff800000 in Low Peripheral
+      mode. Table 104 (p92-93): ARM_CONTROL timer and AXI error control, TIMER_CNTRL0-3 and MAILBOX_CNTRL0-3
+      per-core routing, IRQ_SOURCE0-3 at 0x60 and FIQ_SOURCE0-3 at 0x70. p163 13.1-13.2: sixteen ARM
+      mailboxes between cores, MBOX_SET00 at 0x80 (Table 202), and a NOTE that these are distinct
+      from the VPU mailboxes in the ARMC block. Contrary search: section 1.2 address ranges (p6 agrees
+      on 0x4_C000_0000 and 0xFF80_0000), rest of 6.5.2 and chapter 13; none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   clocks-and-power:
     basis: 8902cce1c1ba4edef727234b04fbcdaa6a257acb2651549bcdacfc68e14618d1
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'Clock Manager controls the UART clock (§11.1, p. 144),
-
-      and only the GP clocks are described (§5.4, p. 81; no other CM_ registers in the document).
-
-      Channel 8, tags 0x00030002/0x00030047/0x00038002 and their semantics, rate 0 for a missing clock,
-
-      IDs 1/2/12 and base-clock meaning all match the wiki "Clocks" section.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/22 "Clocks and power"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p2
+    note: 'Datasheet p144 11.1: "The UART clock source and associated dividers are controlled by the
+      Clock Manager." p81 5.4 describes only the general-purpose GPIO clocks; a full-text search for
+      Clock Manager / CM_ registers found only CM_GP0-2 CTL/DIV and a PWM mention, supporting the
+      negative statement. Wiki Mailbox-property-interface at c9e615a: preamble says channel 8 is ARM-to-VC
+      requests; Clocks section: IDs 1 EMMC, 2 UART, 12 (0xc) EMMC2, all rates are base clocks before
+      peripheral dividers; Get clock rate 0x00030002 (rate 0 if the clock does not exist), Get clock
+      rate measured 0x00030047 (actual rate respecting clamping, throttling and divider limits, instead
+      of the last requested value), Set clock rate 0x00038002 (may be clamped). The closing advice
+      to use the measured rate is a reasonable reading of the measured tag''s description. Contrary/limit
+      search: the wiki covers every Pi, not only BCM2711, and its example "3MHz for UART" base clock
+      differs from the 48 MHz init_uart_clock default in the legacy config docs; this is an illustrative
+      example on a generic page and does not contradict any value the claim states.'
+    contrary_evidence: none-found
+    citation_precision: imprecise
   gpio-and-pinmux:
     basis: 4df3fda6302ceecd89b453599a2cf41d9f0f4639fc97ce31f0d2e118f50dc037
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: '58 GPIOs in banks 0–27/28–45/46–57 and four interrupt
-
-      lines (§5.1, p. 65). Base and register offsets (Table 63, p. 66). Pull encoding (Table 90, p.
-      74).
-
-      VC 49–52 "GPIO 0–3" (Table 102), GIC per Figure 7.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/25 "GPIO and pinmux"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p2
+    note: 'Datasheet p65 5.1: 58 GPIOs in banks 0-27, 28-45, 46-57; four interrupt lines, one per
+      bank and a fourth shared. p66 5.2 Table 63: base 0x7e200000, GPFSEL0-5 at 0x00-0x14, GPSET0
+      0x1c, GPCLR0 0x28, GPLEV0 0x34, GPIO_PUP_PDN_CNTRL_REG0-3 at 0xe4-0xf0. p74 Table 90: two bits
+      per pin, 00 none, 01 pull-up, 10 pull-down (11 reserved). p86-87 Table 102: GPIO 0-3 at VC IRQ
+      49-52; p89 Figure 7: VC IRQs at SPI 96-159, so 145-148. Contrary search: the rest of chapter
+      5 register descriptions and Tables 91-93; none found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   peripheral-memory-ordering:
     basis: 593aea8fe2e86cb68dd26c6e09c5887de4b01b32f6f5735c9f28e75ae654e4c6
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'barrier placement and the interrupt-handler
-
-      rules match §1.3 (pp. 6–7). Normal Non-cacheable over-read/merge and Device memory for
-
-      peripherals match A72 TRM §6.4.1 (p. 6-291).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/26 "Peripheral memory ordering"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p2
+    note: 'Datasheet p6-7 1.3: the AXI system does not always return read data in order; only when
+      switching between peripherals; place a write barrier before the first write and a read barrier
+      after the last read; an interrupt routine that reads starts with a read barrier, one that writes
+      ends with a write barrier. p7 adds that writes arrive in order except when two peripherals drive
+      the same external equipment, which does not conflict with the advice. Cortex-A72 TRM 6.4.1 (section
+      starts p6-289; the Non-cacheable and Device paragraphs are on p6-291): Normal Non-cacheable
+      reads may over-read and a single access may satisfy several requests, writes may merge; Device
+      types are used for memory-mapped peripherals. Contrary search: rest of 6.4.1 (Table 6-1, mixed-type
+      warnings) and 1.2 of the datasheet; none found. "Map peripherals as Device memory" is prescriptive
+      advice resting on the TRM''s stated purpose of Device memory; acceptable as a direct reading.'
+    contrary_evidence: none-found
+    citation_precision: exact
   dtb-runtime-patching:
     basis: 6e6fc84c56634cd05465e75423da4c693a4515ed4674204f7c9f56ad48943510
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'DTB choice by board revision, edits, config.txt
-
-      parameters and overlays, pointer to the merged tree ("Device Trees, overlays, and parameters").
-
-      `/chosen` firmware parameters ("Firmware parameters").'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Quick-facts/27 "DTB runtime patching"
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p3
+    note: 'reference.adoc "Device Trees, overlays, and parameters" (lines 110-116) says the firmware
+      loader chooses the DTB by board revision number, modifies it, scans config.txt parameters and
+      overlays and applies them, then launches the kernel with a pointer to the merged DTB. "Firmware
+      parameters" (line 1013ff) says the firmware uses /chosen to pass parameters to the OS. "Parse
+      the live tree, not the source" is supported by the same document''s statement under "Test overlays
+      using dtmerge, dtdiff, ovmerge, and kdtc" (about line 1254) that the source DTBs in /boot/firmware
+      lack overlays, parameters and other firmware modifications; that heading is not cited. Contrary
+      search over the computers/ asciidoc tree: device_tree= in config.txt can name a specific DTB
+      or (empty) force ATAGs instead of a DT ("Using Device Trees on Raspberry Pi", line 843; also
+      line 1364/1374 and the CM peripheral guide). These are opt-out configurations; the claim describes
+      the default path, as the cited section does, so the verdict stands, but the author may add "by
+      default (device_tree= overrides)".'
+    contrary_evidence: found
+    citation_precision: imprecise
   the-gic-and-arm-local-bases-are-not-legacy-addresses:
     basis: 1aa990dfeed7735778f86fee5478a9d8c43177358e08d8257bc05428751191e1
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: '"every other
-
-      peripheral address in the datasheet is a legacy master address" is the datasheet''s own scope
-
-      (§6.5.1 and §6.5.2, p. 92: "unlike other peripheral addresses in this document, this is an
-
-      ARM-only address and not a legacy master address"; §1.2.4, p. 6 says the same of the
-
-      document''s peripheral addresses). The full-map and Low Peripheral figures in §1.2.3 are region
-
-      bounds, not peripheral addresses, and §13.2''s restatement for ARM_LOCAL agrees. Both bases,
-
-      0x4_C004_0000 and 0xFF84_0000 for the GIC, match §6.5.1. The earlier overstated-scope FAIL is
-
-      resolved.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Gotchas/1 "The GIC and ARM_LOCAL bases are not legacy addresses."
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p3
+    note: 'Datasheet 6.5.1 and 6.5.2 (printed p. 92): GIC-400 base 0x4c0040000 (= 0x4_C004_0000) and
+      ARM_LOCAL base 0x4c0000000, each "unlike other peripheral addresses in this document ... an
+      ARM-only address and not a legacy master address", becoming 0xff840000 / 0xff800000 in Low Peripheral
+      mode. Matches the claim''s values for the GIC. Contrary search: whole-text search for "ARM-only"
+      / "not a legacy" found only these two plus a repeat of the ARM_LOCAL statement in the ARM-side
+      timer chapter; 1.2.4 (p. 6) confirms other document addresses are legacy master addresses. None
+      found contrary.'
+    contrary_evidence: none-found
+    citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-second
+    - verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-r2
       verdict: PASS
-      date: '2026-10-09'
-      note: 'Datasheet 6.5.1 and 6.5.2 p92: GIC-400 base 0x4c0040000 and ARM_LOCAL 0x4c0000000 are,
-        "unlike other peripheral addresses in this document", ARM-only and not legacy master addresses,
-        becoming 0xff840000 and 0xff800000 in Low Peripheral mode; 1.2.4 p6 says the document''s peripheral
-        addresses are legacy. Matches. Contrary search: chapters 1, 6 and 13 for other ARM-only addresses;
-        none found.'
+      date: '2026-10-14'
+      note: 'Datasheet 6.5.1 (p.92): GIC-400 base 0x4c0040000 (= 0x4_C004_0000), "unlike other peripheral
+        addresses in this document" ARM-only, not a legacy master address, becoming 0xff840000 in
+        Low Peripheral mode; 6.5.2 (p.92): same wording for ARM_LOCAL at 0x4c0000000 / 0xff800000.
+        The claim''s "every other peripheral address ... is a legacy master address" restates the
+        datasheet''s own "unlike other peripheral addresses" and 1.2.4. Contrary search: grep of the
+        full PDF text for hex addresses outside the legacy Main-peripheral window and for "ARM-only"/"not
+        a legacy"; only these two bases appear (ARM_LOCAL repeated in chapter 12''s area), so no other
+        exception found.'
   one-gic-line-serves-many-blocks:
     basis: 7372ed5d66d026f05545a66de4b214c444c71322269a608d8483eca1e84d1beb
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'the groupings and status-register advice
-
-      match §2.1, §6.2.4 and Figure 6. The ETH_PCIe lines reach the GIC individually (Figure 7), and
-
-      the legacy controller gets only their OR on VC 58 (§6.2.5 text, p. 89).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Gotchas/2 "One GIC line serves many blocks."
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p3
+    note: 'Table 102 (pp. 86-87): VC IRQ 29 AUX, 53 OR of all I2C, 54 OR of all SPI, 57 OR of all
+      PL011, 58 OR of all ETH_PCIe L2, 62 EMMC & EMMC2. Figure 6 (p. 88): UART1, SPI1, SPI2 -> AUX_IRQ
+      -> 29; SPI0, SPI3-6 -> PACTL_CS -> 54; I2C0-7 -> 53; UART0,2,3,4,5 -> 57. Figure 7 (p. 89):
+      VC IRQs 0-63 at GIC SPI IDs 96-159, ETH_PCIe L2 IRQs at 160-216 (57 lines). The ordered 96+n
+      mapping gives 153, 149, 150, 125 and 158 as claimed. p. 88 text: 23, 24, 46 and 62 are ORs whose
+      only option is reading each peripheral''s status; p. 89: the 57 ETH_PCIe interrupts are not
+      routed to the legacy controller, only VC IRQ 58. 2.1 (p. 8): the three auxiliaries share one
+      interrupt. Contrary search: chapter 6 sections 6.1-6.4 and the worked example near PACTL_CS;
+      none. The GIC number per line relies on reading Figure 7''s range in order, which is the figure''s
+      evident meaning. Locators: "6.2.4-6.3", pages 87 to 89, cover Figure 6.'
+    contrary_evidence: none-found
+    citation_precision: exact
   peripheral-mode-is-a-three-way-agreement:
-    basis: 910fd7ed79aaedec5e32c5375eeaa13cfcb3b89ba204ed627bcd674f47817a59
+    basis: c72afad9e33d1796a0d25b00a250c1c3f0c285a64dd457101413bf4eb5f7ab80
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'legacy boot options,
-
-      `arm_peri_high`: enabling high peripheral mode without a compatible device tree "will make your
-
-      system fail to boot", and "currently ARM stub support is missing, so you will also need to load
-
-      a suitable file using `armstub`". The bullet attributes the stub statement to the documentation
-
-      and no longer claims a stub mismatch stops the boot. The earlier FAIL is resolved.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Gotchas/3 "Peripheral mode is a three-way agreement."
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p5
+    note: 'Claim vs. legacy_config_txt/boot.adoc at 42deaefb: both cited headings exist ("== Legacy
+      boot options", line 1; "=== `arm_peri_high`", line 32). The NOTE at line 36 says that enabling
+      high peripheral mode without a compatible Device Tree makes the system fail to boot, and quotes
+      "Currently ARM stub support is missing, so you will also need to load a suitable file using
+      `armstub`". The quoted phrase matches exactly; the commit date 2026-10-06 matches. The claim
+      is attributed to the documentation and scoped to that snapshot. It does not say the stub statement
+      still holds, which is appropriate. Small paraphrase: "an armstub file of your own" vs the page''s
+      "a suitable file". The page does not say the file must be self-made; "a suitable armstub file"
+      would be more exact. Relations: ''#peripheral-mode-selection'' (refines) already carries both
+      statements, word for word, at the same pin and heading. This fact adds only the "three-way agreement"
+      framing (mode setting + device tree + stub), and that framing is a fair summary of the NOTE.
+      The relation is accurate, but the two claims are near-duplicates, so they can drift apart; consider
+      `same-as`, or narrowing this fact to the framing. The ''qualifies'' relation to ''#high-peripheral-mode-is-full-map''
+      fits the TODO more than the claim. The claim names no addresses. The TODO method''s "full-map
+      (35-bit) addresses" and "the mode''s address" assume that hedged inference. The method handles
+      that assumption failing: if high mode is not the full map, both high-mode runs are silent and
+      the result is inconclusive. TODO method: it can observe the question asked, under the stated
+      conditions. (a) The image does its own UART0 pinmux and enable, so output does not depend on
+      firmware UART setup. (b) A non-secure kernel reads GICD_IGROUPRn as RAZ/WI (gicv2-spec 4.3.4),
+      so the GIC-state readout cannot see the stub''s main GIC write, the group assignment. But GICD_ISENABLERn
+      bits of Group 0 interrupts are RAZ/WI to non-secure accesses (4.3.5). So the "enabled interrupt
+      is taken" criterion does observe whether the stub moved interrupts to Group 1 at the GIC address
+      that mode uses. The method correctly says that UART output alone is not enough. (c) AArch64
+      with the MMU off reaches the 35-bit addresses. Should-fix findings for the author (not FAIL):
+      (1) The decision rule leaves unclassified the outcome the documentation predicts: the control
+      prints and the test is silent. State that this shows the built-in stub does not support high
+      mode (or that the firmware does not hand off). (2) "The same GIC state" is compared against
+      an unidentified "known-good" stub. A built-in stub that sets up the GIC correctly but with a
+      different benign value (for example the priority mask) would be read as "does not support".
+      Pin the control stub (for example armstub8.S at rpi-tools 439b6198, built for high peripherals),
+      and make the interrupt being taken, plus the enable bits of GICD_CTLR and GICC_CTLR, the deciding
+      criterion. (3) Have the image report its entry exception level and security state. Banked GIC
+      views are comparable only when both runs enter the same way. (4) At rpi-tools 439b6198, armstub8.S
+      also relocates its ARM_LOCAL control and prescaler writes under its high-peripheral build option,
+      not only the GIC writes. The method does not read the ARM_LOCAL control and prescaler registers
+      at the mode''s ARM_LOCAL address, so "supports high mode" would not cover the timer-prescaler
+      setup. Either add that read to the comparison, or narrow the TODO text to the GIC. Contrary-evidence
+      search: all of legacy_config_txt/boot.adoc; config_txt/boot.adoc''s armstub section (at this
+      pin it says the built-in default stub is "selected automatically based on the Raspberry Pi model
+      and various settings", which neither confirms nor contradicts high-mode support); a search of
+      the whole documentation tree at the pin for arm_peri_high, armstub and "high peripheral" (no
+      other mention). No statement contradicting the claim as scoped. Current firmware behavior was
+      not checked (no hardware; that is the TODO).'
+    contrary_evidence: none-found
+    citation_precision: exact
     readers:
-    - verifier: Claude Code, claude-opus-5-5, reader bcm2711-sf2-10b-second
+    - verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-r4
       verdict: PASS
-      date: '2026-10-09'
-      note: 'legacy_config_txt/boot.adoc arm_peri_high: high peripheral mode without a compatible
-        tree fails to boot; "Currently ARM stub support is missing, so you will also need to load
-        a suitable file using armstub". The claim attributes the stub statement to the documentation
-        and draws the documentation''s own conclusion. Contrary evidence found: raspberrypi/tools
-        armstubs/Makefile at 439b6198 builds armstub8-gic-highperi (lines 1, 26) into armstubs.h (lines
-        78, 97-98), so the "currently" note may be stale; the attribution keeps the claim true, so
-        it does not change the verdict.'
+      date: '2026-10-14'
+      note: 'Claim vs. legacy_config_txt/boot.adoc at 42deaefb: heading "Legacy boot options" (line
+        1) and "arm_peri_high" (line 32) exist; the NOTE at line 36 says enabling high peripheral
+        mode without a compatible Device Tree makes the system fail to boot, and quotes verbatim "Currently
+        ARM stub support is missing", requiring a suitable file loaded with armstub. The commit date
+        2026-10-06 matches the checkout. The claim attributes these as documentation statements and
+        expressly does not assert the stub statement for current firmware, so no derivation is hidden
+        in the doc claim. Relations: "refines #peripheral-mode-selection" fits (same NOTE, narrower);
+        "qualifies #high-peripheral-mode-is-full-map" fits (conditions on entering that mode); the
+        TODO''s full-map addresses lean on that inference fact, and the method''s control run covers
+        it (if the full map is wrong, both high-mode runs print nothing and the result is inconclusive
+        rather than wrong). TODO method assessment: it can observe the question in principle. AArch64
+        with the MMU off reaches 35-bit physical addresses; the control (known-good high-mode stub,
+        e.g. the armstub8-gic-highperi build) isolates the stub as the only variable; the image does
+        its own pinmux and UART init so firmware UART setup cannot mask the result; and the interrupt-taken
+        test is the real discriminator, because under the GIC Security Extensions (GIC-400 implements
+        them) GICD_IGROUPRn is RAZ/WI to Non-secure accesses and enable bits of Group 0 interrupts
+        are RAZ/WI to Non-secure accesses (gicv2-spec 4.3.4, 4.3.5): a Non-secure kernel cannot enable
+        or take an interrupt the stub left in Group 0. Three weaknesses, none making the method impossible
+        (recommended, not a FAIL): (1) the decision rule leaves unclassified the outcome the documentation
+        itself predicts, control prints and test prints nothing; given the same image and device tree,
+        that should read as "does not support" (or be stated explicitly); (2) "the same GIC state"
+        compares only Non-secure-banked views, since the stub''s group programming is invisible from
+        Non-secure state; the method should say so, and the image should also print CurrentEL, because
+        a run entered at EL3 (no stub effect) sees the Secure view and could enable and take a Group
+        0 interrupt itself, falsely matching the control on "interrupt taken"; (3) the TODO text asks
+        whether peripherals are "set up", but the image initializes UART0 itself, so the method observes
+        only reachability of the peripherals; the text should say "reachable". Contrary-evidence search:
+        all of rpi-docs at the pin for arm_peri_high / high peripheral / armstub (only config_txt/boot.adoc''s
+        armstub section, which says the default stub is in firmware and selected by model and settings,
+        with no high-mode statement); rpi-tools armstubs at 439b6198 builds an armstub8-gic-highperi
+        variant and emits it into a generated armstubs.h table alongside the other stubs, which hints
+        that a firmware-embedded high-mode stub may exist. This does not contradict the claim, which
+        reports the documentation and disclaims current firmware, but it supports keeping that hedge
+        and the hardware TODO.'
   pulls-are-set-through-gpio-pup-pdn-cntrl-reg0-3:
     basis: 9c0f0a113fe20d67bb5b9fd6f6ac80cd0e4d5399e9a14d3d6d8a577be9441da7
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'they are the only pull
-
-      registers in Table 63 (p. 66). Two bits per pin and the read-back of the current pull state
-
-      match Table 90 and its description (p. 74).'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Gotchas/4 "Pulls are set through `GPIO_PUP_PDN_CNTRL_REG0`–`3`."
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p3
+    note: 'Table 63 (5.2, p. 66) lists GPFSEL, GPSET, GPCLR, GPLEV, event-detect registers and GPIO_PUP_PDN_CNTRL_REG0-3
+      at 0xe4-0xf0; no other pull register (no GPPUD/GPPUDCLK). Table 90 (p. 74, continued p. 75)
+      gives 2-bit RW fields per GPIO (00 none, 01 up, 10 down, 11 reserved) and the description says
+      reading the registers gives the current pull state. Contrary search: whole datasheet text for
+      other pull registers; the only other pull mention is the alternate-function table''s post-power-down
+      pull state, which is not a register. None found.'
+    contrary_evidence: none-found
+    citation_precision: exact
   legacy-dma-reaches-1-gb-at-a-time:
     basis: 5f7b1958b5662c0e86b11b6bac197aa4dd1419d401d6c595e4c389dbd11e34e1
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'the window is moved with "the PAGE or
-
-      PAGELITE bits" (§1.2.4, p. 6). ENABLE.PAGE (27:24) sets the 1 GB page for "the 30-bit DMA
-
-      engines (DMA0-6)" and PAGELITE (31:28) for "the DMA Lite engines (DMA7-10)" (Table 62, p. 60),
-
-      one field per group, so the setting is shared across the group. The L2 aliases at 0x0 and
-
-      0x8000_0000 "can''t be moved, and are limited to the first 1GB of SDRAM" (§1.2.4, p. 6). The
-
-      earlier FAIL is resolved.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Gotchas/5 "Legacy DMA reaches 1 GB at a time."
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p3
+    note: '1.2.4 (p. 6): DMA to RAM uses a 1 GB legacy window moved with PAGE or PAGELITE; the L2
+      cache windows cannot be moved and are limited to the first 1 GB. Table 62 (p. 60): ENABLE register
+      PAGE[27:24] for the 30-bit engines DMA0-6 and PAGELITE[31:28] for DMA Lite 7-10, one field each
+      in a global register, hence shared by the group. Contrary search: chapter 4 overview and DMA4
+      / channel 15 text; DMA4 engines (11-14) are large-address masters and channel 15 is VPU-only,
+      so neither contradicts the claim''s scope (legacy engines 0-10).'
+    contrary_evidence: none-found
+    citation_precision: exact
   the-mini-uart-s-baud-rate-follows-the-core-clock:
     basis: 266169529fcc139523e54313242f7029bd8b48672243e12a59a3e36c7774c46d
     verdict: PASS
-    date: '2026-10-08'
-    verifier: Claude Opus 5.5, Claude Code subagent (delta of 90b3562 against the e7529fe record,
-      itself a delta of e7529fe against the 6d3790f record; second reader run separately)
-    note: 'the UARTs page, "Mini UART
-
-      and core frequency": the baud changes with the core clock and fixing the VPU clock is the remedy.
-
-      The PL011 choice follows from the page''s comparison of the two UART types.'
-    carried_from:
-      repo: hardware-specs-docs
-      commit: 69228ccbad909c7686039f1b8c190eb3620b8bc5
-      path: specs/resources/bcm2711.verify.md
-      key: Gotchas/6 "The mini UART's baud rate follows the core clock."
-      format: 1
+    date: '2026-10-14'
+    verifier: Claude Code subagent, claude-opus-5-5, Claude Code, session docs-p3
+    note: 'interfaces.adoc "Mini UART and core frequency" (line 324ff): the mini UART clock derives
+      from the VPU core clock, its baud rate changes with it, and a fixed core clock (enable_uart=1
+      / core_freq=250) is the documented remedy. The advice to use UART0 (PL011) instead rests on
+      "UART types" (line 199ff), which names the mini UART''s baud-rate link to the VPU clock as the
+      main way it is less capable than the PL011; that heading is not cited. Contrary search: the
+      rest of the UART section and legacy init_uart_clock (UART0 clocked separately at 48 MHz by default);
+      none contrary. Suggest adding heading "UART types" to the support.'
+    contrary_evidence: none-found
+    citation_precision: imprecise
   ram:
     basis: 54990c5e24c3a27e5dced34a3f711b5a885315cb8303d333040883dc500e8dd8
     verdict: PASS

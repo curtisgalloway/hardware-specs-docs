@@ -700,9 +700,11 @@ facts:
   claim: |-
     Raspberry Pi's documented early console for BCM2711 boards is
     `earlycon=pl011,mmio32,0xfe201000` (UART0) or `earlycon=uart8250,mmio32,0xfe215040` (the mini
-    UART), at 115200 baud by default. The firmware's initial UART0 clock is 48 MHz
-    (`init_uart_clock`, UART0 only, baud at most a sixteenth of it) and its initial baud 115200
-    (`init_uart_baud`).
+    UART), at 115200 baud by default. Among its legacy boot options (raspberrypi/documentation
+    commit `42deaefb`, committed 2026-10-06), the documentation gives the firmware's initial UART0
+    clock as 48 MHz by default (`init_uart_clock`, UART0 only, baud at most a sixteenth of it) and
+    its initial baud as 115200 by default (`init_uart_baud`); these are documented legacy options,
+    and this spec does not assert those defaults for current firmware.
   support:
   - class: doc
     doc: rpi-docs-uarts
@@ -711,8 +713,23 @@ facts:
   - class: doc
     doc: rpi-docs-legacy-config-txt
     at:
+    - heading: Legacy boot options
     - heading: init_uart_clock
     - heading: init_uart_baud
+  relates:
+  - fact: '#debug-uart'
+    relation: qualifies
+  todo:
+    check: hardware
+    text: |-
+      whether current firmware still starts UART0 from a 48 MHz clock at 115200 baud when
+      `config.txt` sets neither `init_uart_clock` nor `init_uart_baud`.
+    method: |-
+      Boot current firmware with no `init_uart_*` lines and a bare-metal kernel image that,
+      before touching UART0, reads its IBRD, FBRD and LCRH registers as the firmware left them and
+      asks the firmware for the UART clock rate through the mailbox property interface; derive the
+      baud from the clock and divisors, and confirm by receiving the kernel's output on a host
+      terminal set to that rate.
 - id: usb-controllers
   section: quick-facts
   title: USB controllers
@@ -1007,14 +1024,43 @@ facts:
   section: gotchas
   title: Peripheral mode is a three-way agreement
   claim: |-
-    High peripheral mode without a device tree
-    written for it stops the boot; and since the documentation says the stock stub lacks support
-    for it, an `armstub` of your own is needed.
+    Raspberry Pi's legacy boot options documentation says that high peripheral
+    mode without a device tree written for it makes the system fail to boot; as of the
+    documentation snapshot read (raspberrypi/documentation commit `42deaefb`, committed 2026-10-06)
+    it also says "Currently ARM stub support is missing", so that an `armstub` file of your own is
+    needed. The page is not dated beyond that snapshot, and this spec does not assert that the stub
+    statement still holds for current firmware.
   support:
   - class: doc
     doc: rpi-docs-legacy-config-txt
     at:
+    - heading: Legacy boot options
     - heading: arm_peri_high
+  relates:
+  - fact: '#peripheral-mode-selection'
+    relation: refines
+  - fact: '#high-peripheral-mode-is-full-map'
+    relation: qualifies
+  todo:
+    check: hardware
+    text: |-
+      whether current firmware's built-in stub supports high peripheral mode: with
+      `arm_peri_high=1`, a device tree written for high peripheral mode and no `armstub=` line,
+      does the kernel run with the peripherals and the GIC set up and reachable at their full-map
+      (35-bit) addresses?
+    method: |-
+      Boot one AArch64 bare-metal kernel image (AArch64 so that it can reach 35-bit addresses
+      with the MMU off) three ways, each with a device tree for its mode: a low-mode baseline with
+      no `arm_peri_high` and the default stub; a control with `arm_peri_high=1` and a known-good
+      high-mode `armstub`; and the test, with `arm_peri_high=1` and no `armstub=` line. The image
+      relies on no firmware UART setup: it routes UART0 to GPIO14/15 itself (ALT0), initializes
+      and enables UART0 at the mode's address from the datasheet's address maps, then prints the
+      GIC distributor and CPU interface state it reads at the mode's GIC address and reports
+      whether an enabled GIC interrupt is taken. UART output alone shows only that the kernel was
+      entered with peripherals high, not that the stub set up the GIC. The built-in stub supports
+      high mode when the test run matches the control: output, the same GIC state and the
+      interrupt taken; output with different GIC state or no interrupt shows it does not. If the
+      control produces no output, or neither high-mode run does, the result is inconclusive.
 - id: pulls-are-set-through-gpio-pup-pdn-cntrl-reg0-3
   section: gotchas
   title: Pulls are set through `GPIO_PUP_PDN_CNTRL_REG0`–`3`
