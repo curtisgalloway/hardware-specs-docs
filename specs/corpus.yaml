@@ -1,0 +1,548 @@
+# SPDX-FileCopyrightText: 2026 contributors
+# SPDX-License-Identifier: CC-BY-4.0
+#
+# Corpus ledger for hardware-specs-docs (driver-lab skills/spec-format/SKILL.md, "Corpus
+# ledger"): every document and hardware block discovery found, each with a disposition. The
+# document entries mirror the specs' resources.documents (name, access, sha256).
+format: 2
+derivation: >-
+  Documents: every resources.documents entry of the five specs, plus the RK3588 brief
+  datasheet the rk3588 block list is read from. Blocks are read from public documents only,
+  never from a source tree. rk3588: one entry per block named in the block diagram on PDF
+  page 2 of Rockchip's RK3588 Brief Datasheet (rk3588-brief-datasheet); cache sizes and the
+  NPU's shared memory are folded into the cluster, GPU and NPU entries. bcm2711: one entry per
+  peripheral in the section 1.1 list, the address-map figure (section 1.2.1) and chapters 2 to
+  13 of BCM2711 ARM Peripherals (bcm2711-peripherals), with the VPU mailboxes the section 13.1
+  note names. rock5t: one entry per device or connector in section 3 (Hardware and Interfaces)
+  of the ROCK 5T Product Brief (rock5t-product-brief). The two ip specs (arm-generic-timer-ip,
+  arm-gicv3-ip) each describe one architecture and list no blocks. A block a spec fact covers
+  names it with a spec disposition; a fact that only records a gap leaves the block planned, with
+  the fact in its note. Blocks outside boot bring-up (multimedia, audio, accelerators,
+  security, coprocessors) are excluded; the rest are planned.
+documents:
+  - name: arm-generic-timer-102379-0104.pdf
+    title: Learn the architecture - Generic Timer
+    access: public
+    sha256: c8fb557a14970b8302e2f12560fc9038d650da9aaaf97d4bb85327bfa401e82c
+    disposition: "spec:arm-generic-timer-ip"
+  - name: arm-ihi0069g.pdf
+    title: Arm Generic Interrupt Controller Architecture Specification, GIC architecture version 3 and version 4
+    access: public
+    sha256: f5461ced0b908141c87f655e602ff6340a90f14028ea009239c388ed69b78ac6
+    disposition: "spec:arm-gicv3-ip"
+  - name: bcm2711-peripherals
+    title: BCM2711 ARM Peripherals, release 4 (2022-01-18), Raspberry Pi document RP-008248-DS
+    access: public
+    sha256: d6e16ea089a1716e80621f99a26e130a2379f0a81d945dc22e4f80dc49dcdc78
+    disposition: "spec:bcm2711"
+  - name: rpi-docs-config-txt
+    title: Raspberry Pi documentation, config.txt boot options (config_txt/boot.adoc)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-docs-legacy-config-txt
+    title: Raspberry Pi documentation, legacy config.txt boot options (legacy_config_txt/boot.adoc)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-docs-uarts
+    title: Raspberry Pi documentation, UARTs (configuration/interfaces.adoc)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-docs-boot-folder
+    title: Raspberry Pi documentation, boot folder and Device Trees (configuration/reference.adoc)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-docs-eeprom-boot-flow
+    title: Raspberry Pi documentation, EEPROM boot flow (raspberry-pi/bootflow-eeprom.adoc)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-docs-bcm2711
+    title: Raspberry Pi documentation, BCM2711 processor page (processors/bcm2711.adoc)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-wiki-mailbox-property-interface
+    title: Raspberry Pi firmware wiki, Mailbox property interface
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-docs-bcm2712
+    title: Raspberry Pi documentation, BCM2712 processor page (processors/bcm2712.adoc)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: tfa-rpi4
+    title: Trusted Firmware-A documentation, Raspberry Pi 4 platform (docs/plat/rpi4.rst)
+    access: public
+    disposition: "spec:bcm2711"
+  - name: linux-arm64-booting
+    title: Linux arm64 boot protocol (Documentation/arch/arm64/booting.rst), Linux v7.2
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-wiki-mailboxes
+    title: Raspberry Pi firmware wiki, Mailboxes
+    access: public
+    disposition: "spec:bcm2711"
+  - name: rpi-wiki-accessing-mailboxes
+    title: Raspberry Pi firmware wiki, Accessing mailboxes
+    access: public
+    disposition: "spec:bcm2711"
+  - name: devicetree-spec
+    title: Devicetree Specification v0.4, chapters 3 and 5
+    access: public
+    disposition: "spec:bcm2711"
+  - name: gic-400-trm
+    title: Arm CoreLink GIC-400 Generic Interrupt Controller TRM, r0p1 (DDI 0471B)
+    access: public
+    sha256: 15463e9ac6c82114378b4dc7cee1fb4eaa545f4b5073af4bf8a57d22b9403c52
+    disposition: "spec:bcm2711"
+  - name: gicv2-spec
+    title: Arm Generic Interrupt Controller Architecture Specification, GICv1 and GICv2 (IHI 0048B)
+    access: public
+    sha256: 7a05a16404e2e1099a456b398d1c9c4e148629b25a455bc22647dbcaeb80abda
+    disposition: "spec:bcm2711"
+  - name: arm-arm
+    title: Arm Architecture Reference Manual for A-profile architecture (DDI 0487), issue M.d
+    access: public
+    sha256: 80d589a4645feba6bdb9d77edfaf04d4394d5d5444a4c41f97cf4fdd20eee3d5
+    disposition: "spec:bcm2711"
+  - name: pl011-trm
+    title: Arm PrimeCell UART (PL011) TRM, r1p5 (DDI 0183G)
+    access: public
+    sha256: 9cfe1a296ebe7accd905fb569e4c545ed9ca01d8341603568017319abe7e51e7
+    disposition: "spec:bcm2711"
+  - name: cortex-a72-trm
+    title: Arm Cortex-A72 MPCore Processor TRM, r0p3 (100095_0003_06)
+    access: public
+    sha256: 47f52c93806507962c2cd0b77991d7aebacfaae5734ac617fc45a5babdff738f
+    disposition: "spec:bcm2711"
+  - name: gic600-trm
+    title: Arm CoreLink GIC-600 Generic Interrupt Controller Technical Reference Manual
+    access: public
+    sha256: 500c1d7d733d576ca8de8c3bc4592bfcaf102267a5ddeff01d9e4ef997a7050f
+    disposition: "spec:rk3588"
+  - name: rock5t-schematic
+    title: Radxa ROCK 5T schematic, V1.2
+    access: public
+    sha256: 82144737b9848a7784d800c4f6110029997e2a557a0667a9f38f0b793d334491
+    disposition: "spec:rock5t"
+  - name: rock5t-product-brief
+    title: Radxa ROCK 5T Product Brief (RAD-DOC-0117)
+    access: public
+    sha256: 4d1f0f030114abed6e73cc6844aafa1e02c1f2b7ee602ed304cf38dec0c891b4
+    disposition: "spec:rock5t"
+  - name: radxa-docs-serial
+    title: Radxa documentation, UART serial console (shared page used by the ROCK 5T docs)
+    access: public
+    disposition: "spec:rock5t"
+  - name: radxa-docs-maskrom-linux
+    title: Radxa documentation, ROCK 5T flashing via Maskrom from a Linux PC
+    access: public
+    disposition: "spec:rock5t"
+  - name: radxa-docs-rkdeveloptool
+    title: Radxa documentation, rkdeveloptool (shared page included by the ROCK 5T Maskrom page)
+    access: public
+    disposition: "spec:rock5t"
+  - name: radxa-docs-uboot
+    title: Radxa documentation, U-Boot development (shared page, ROCK 5T row)
+    access: public
+    disposition: "spec:rock5t"
+  - name: radxa-docs-rock5t-uboot
+    title: Radxa documentation, ROCK 5T U-Boot development (wrapper page, rock5/rock5t/low-level-dev/u-boot.md)
+    access: public
+    disposition: "spec:rock5t"
+  - name: radxa-docs-nvme
+    title: Radxa documentation, installing the system to NVMe (shared page used by the ROCK 5T docs)
+    access: public
+    disposition: "spec:rock5t"
+  - name: uboot-docs-rockchip
+    title: U-Boot documentation, Rockchip boards (doc/board/rockchip/rockchip.rst), v2026.10
+    access: public
+    disposition: "spec:rock5t"
+  - name: uboot-docs-booti
+    title: U-Boot documentation, booti command (doc/usage/cmd/booti.rst), v2026.10
+    access: public
+    disposition: "spec:rock5t"
+  - name: linux-booting
+    title: Linux arm64 boot protocol (Documentation/arch/arm64/booting.rst), Linux v7.2
+    access: public
+    disposition: "spec:rock5t"
+  - name: rk3588-brief-datasheet
+    title: Rockchip RK3588 Brief Datasheet (3 pages, copyright 2025)
+    access: public
+    sha256: 81aff61337ab10bf0f7c9234450703816037af169bf6657d3d62b868bd61fd1a
+    subsystem: soc
+    disposition: "planned: list in rk3588's resources.documents when a fact cites it"
+    note: >-
+      Retrieved from
+      https://www.rock-chips.com/uploads/pdf/2022.8.26/191/RK3588%20Brief%20Datasheet.pdf
+      (749066 bytes, retrieved 2026-10-19). Feature list and block diagrams only, no register-level content; it is the
+      source of the rk3588 block list below.
+blocks:
+  # rk3588: rk3588-brief-datasheet, PDF page 2 (block diagram).
+  - name: rk3588-cortex-a76
+    title: "Cortex-A76 quad-core cluster (64K/64K L1, 2MB L2)"
+    subsystem: cpu
+    disposition: "planned: needs a public document for the core numbering"
+    note: "The gap is recorded in spec:rk3588#cpu-mpidr. The board fact spec:rock5t#cpu-complex states the cores exist."
+  - name: rk3588-cortex-a55
+    title: "Cortex-A55 quad-core cluster (32K/32K L1, 512KB L2)"
+    subsystem: cpu
+    disposition: "planned: needs a public document for the core numbering"
+    note: "The gap is recorded in spec:rk3588#cpu-mpidr. The 3MB L3 cache is shared by both clusters."
+  - name: rk3588-mcu
+    title: "MCU (Cortex-M0) x3"
+    subsystem: cpu
+    disposition: "excluded: auxiliary coprocessor outside this root's boot bring-up scope"
+  - name: rk3588-interrupt-controller
+    title: "Interrupt Controller"
+    subsystem: interrupts
+    disposition: "planned: needs a public register-level document"
+    note: "The gap is recorded in spec:rk3588#gic-instance. The GIC-600 programming model is spec:rk3588#gic600-register-pages."
+  - name: rk3588-timer
+    title: "30x Timer"
+    subsystem: timers
+    disposition: "planned: needs a public register-level document"
+    note: "The SoC timers, not the Arm generic timer; the generic timer's gap is recorded in spec:rk3588#system-counter."
+  - name: rk3588-clock-reset
+    title: "Clock & Reset"
+    subsystem: clocks
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-pll
+    title: "18x PLL"
+    subsystem: clocks
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-pmu
+    title: "PMU"
+    subsystem: power
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-system-register
+    title: "System register"
+    subsystem: system
+    disposition: "planned: needs a public register-level document"
+    note: "The gap is recorded in spec:rk3588#uart2-pinmux."
+  - name: rk3588-pwm
+    title: "16x PWM"
+    subsystem: pwm
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-watchdog
+    title: "5x Watchdog"
+    subsystem: watchdog
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-crypto
+    title: "2x Crypto"
+    subsystem: security
+    disposition: "excluded: security block outside this root's boot bring-up scope"
+  - name: rk3588-saradc
+    title: "SAR-ADC"
+    subsystem: adc
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-tsadc
+    title: "TS-ADC"
+    subsystem: thermal
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-dmac
+    title: "3x DMAC"
+    subsystem: dma
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-pvtm
+    title: "6x PVTM"
+    subsystem: system
+    disposition: "excluded: on-die process monitor outside this root's boot bring-up scope"
+  - name: rk3588-mailbox
+    title: "3x Mailbox"
+    subsystem: mailbox
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-npu
+    title: "High Performance NPU (with 1MB Share Memory)"
+    subsystem: npu
+    disposition: "excluded: accelerator outside this root's boot bring-up scope"
+  - name: rk3588-gpu
+    title: "GPU Mali-G610 MP4 (4x256KB L2 Cache)"
+    subsystem: gpu
+    disposition: "excluded: accelerator outside this root's boot bring-up scope"
+  - name: rk3588-rga
+    title: "2D Graphics Engine"
+    subsystem: multimedia
+    disposition: "excluded: multimedia engine outside this root's boot bring-up scope"
+  - name: rk3588-iep
+    title: "Image Enhancement Processor"
+    subsystem: multimedia
+    disposition: "excluded: multimedia engine outside this root's boot bring-up scope"
+  - name: rk3588-isp
+    title: "Dual pipe ISP"
+    subsystem: multimedia
+    disposition: "excluded: multimedia engine outside this root's boot bring-up scope"
+  - name: rk3588-video-encoder
+    title: "8K Video Encoder"
+    subsystem: multimedia
+    disposition: "excluded: multimedia engine outside this root's boot bring-up scope"
+  - name: rk3588-video-decoder
+    title: "8K 10-bits Video Decoder"
+    subsystem: multimedia
+    disposition: "excluded: multimedia engine outside this root's boot bring-up scope"
+  - name: rk3588-jpeg
+    title: "JPEG Encoder/Decoder"
+    subsystem: multimedia
+    disposition: "excluded: multimedia engine outside this root's boot bring-up scope"
+  - name: rk3588-mipi-csi
+    title: "MIPI-CSI receivers (2x DPHY 4L/CPHY 3L, 4x DPHY 2L)"
+    subsystem: camera
+    disposition: "excluded: multimedia interface outside this root's boot bring-up scope"
+  - name: rk3588-mipi-dsi
+    title: "2x MIPI-DSI DPHY 4 Lane"
+    subsystem: display
+    disposition: "excluded: multimedia interface outside this root's boot bring-up scope"
+  - name: rk3588-hdmi-tx-edp
+    title: "2x HDMI2.1 TX/eDP1.3 4 Lane"
+    subsystem: display
+    disposition: "excluded: multimedia interface outside this root's boot bring-up scope"
+  - name: rk3588-dp
+    title: "2x DP1.4 4 Lane with HDCP2.3"
+    subsystem: display
+    disposition: "excluded: multimedia interface outside this root's boot bring-up scope"
+  - name: rk3588-hdmi-rx
+    title: "HDMI RX 2.0"
+    subsystem: display
+    disposition: "excluded: multimedia interface outside this root's boot bring-up scope"
+  - name: rk3588-display-controller
+    title: "Display Controller"
+    subsystem: display
+    disposition: "excluded: multimedia engine outside this root's boot bring-up scope"
+  - name: rk3588-ddr-controller
+    title: "LPDDR4/LPDDR4X/LPDDR5 controller (quad-channel x16bit)"
+    subsystem: memory
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-emmc
+    title: "eMMC5.1"
+    subsystem: storage
+    disposition: "planned: needs a public register-level document"
+    note: "The gap is recorded in spec:rk3588#storage-controllers."
+  - name: rk3588-sdmmc
+    title: "SD3.0/MMC4.5"
+    subsystem: storage
+    disposition: "planned: needs a public register-level document"
+    note: "The gap is recorded in spec:rk3588#storage-controllers."
+  - name: rk3588-sdio
+    title: "SDIO 3.0"
+    subsystem: storage
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-sram
+    title: "Embedded SRAM"
+    subsystem: memory
+    disposition: "planned: needs a public address map"
+    note: "The gap is recorded in spec:rk3588#address-map."
+  - name: rk3588-rom
+    title: "Embedded ROM"
+    subsystem: boot
+    disposition: "planned: needs a public address map"
+    note: "The gap is recorded in spec:rk3588#address-map."
+  - name: rk3588-otp
+    title: "Embedded OTP"
+    subsystem: security
+    disposition: "excluded: security block outside this root's boot bring-up scope"
+  - name: rk3588-usb-otg
+    title: "2x USB OTG 3.1/2.0/TypeC"
+    subsystem: usb
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-usb2-host
+    title: "2x USB Host 2.0"
+    subsystem: usb
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-sata-pcie-usb3
+    title: "SATA3/PCIe2.1/USB3 Host"
+    subsystem: pcie
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-sata-pcie
+    title: "2x SATA3/PCIe2.1"
+    subsystem: pcie
+    disposition: "planned: needs a public register-level document"
+    note: "The ROCK 5T's Ethernet controllers sit on PCIe 2.0 lanes (spec:rock5t#ethernet)."
+  - name: rk3588-pcie3
+    title: "PCIe3.0 (2x2, 1x4, 4x1)"
+    subsystem: pcie
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-gmac
+    title: "2x Giga-Ethernet"
+    subsystem: ethernet
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-uart
+    title: "10x UART"
+    subsystem: uart
+    disposition: "planned: needs a public register-level document"
+    note: "The gap is recorded in spec:rk3588#uart-programming-model."
+  - name: rk3588-spi
+    title: "6x SPI"
+    subsystem: spi
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-i2c
+    title: "9x I2C"
+    subsystem: i2c
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-gpio
+    title: "GPIO"
+    subsystem: gpio
+    disposition: "planned: needs a public register-level document"
+  - name: rk3588-i2s
+    title: "4x I2S/PCM/TDM"
+    subsystem: audio
+    disposition: "excluded: audio interface outside this root's boot bring-up scope"
+  - name: rk3588-spdif
+    title: "2x SPDIF (8ch)"
+    subsystem: audio
+    disposition: "excluded: audio interface outside this root's boot bring-up scope"
+  - name: rk3588-pdm-audio-pwm
+    title: "PDM/Audio PWM"
+    subsystem: audio
+    disposition: "excluded: audio interface outside this root's boot bring-up scope"
+  # bcm2711: bcm2711-peripherals, section 1.1, Figure 1 and chapters 2 to 13.
+  - name: bcm2711-mini-uart
+    title: "Mini UART (UART1, chapter 2)"
+    subsystem: uart
+    disposition: "spec:bcm2711#mini-uart"
+  - name: bcm2711-aux-spi
+    title: "Universal SPI masters SPI1 and SPI2 (chapter 2)"
+    subsystem: spi
+    disposition: "planned: not yet read for a fact"
+  - name: bcm2711-bsc
+    title: "BSC (I2C) masters (chapter 3)"
+    subsystem: i2c
+    disposition: "planned: not yet read for a fact"
+  - name: bcm2711-dma
+    title: "DMA controller (chapter 4)"
+    subsystem: dma
+    disposition: "planned: programming model not yet read for a fact"
+    note: "The DMA engines' view of memory is spec:bcm2711#dma-view-of-memory."
+  - name: bcm2711-gpio
+    title: "General Purpose I/O (chapter 5)"
+    subsystem: gpio
+    disposition: "spec:bcm2711#gpio-and-pinmux"
+  - name: bcm2711-gpclk
+    title: "General purpose GPIO clocks (section 5.4)"
+    subsystem: clocks
+    disposition: "planned: not yet read for a fact"
+    note: "spec:bcm2711#clocks-and-power names them only as what the datasheet describes."
+  - name: bcm2711-gic-400
+    title: "GIC-400 interrupt controller (section 6.3)"
+    subsystem: interrupts
+    disposition: "spec:bcm2711#interrupt-controller"
+  - name: bcm2711-legacy-interrupt-controller
+    title: "Legacy interrupt controller (section 6.4)"
+    subsystem: interrupts
+    disposition: "planned: not yet read for a fact"
+    note: "spec:bcm2711#interrupt-controller names it only as the enable_gic=0 alternative."
+  - name: bcm2711-arm-local
+    title: "ARM_LOCAL block (section 6.5.2)"
+    subsystem: system
+    disposition: "spec:bcm2711#arm-local-block"
+  - name: bcm2711-vpu-mailboxes
+    title: "VPU mailboxes in the ARMC block (named in section 13.1)"
+    subsystem: mailbox
+    disposition: "spec:bcm2711#videocore-mailbox-transport"
+    note: "The fact's register offsets come from the firmware wiki; the block's base address is still open there."
+  - name: bcm2711-pcm
+    title: "PCM / I2S audio (chapter 7)"
+    subsystem: audio
+    disposition: "planned: not yet read for a fact"
+  - name: bcm2711-pwm
+    title: "Pulse Width Modulator (chapter 8)"
+    subsystem: pwm
+    disposition: "planned: not yet read for a fact"
+  - name: bcm2711-spi
+    title: "SPI masters (chapter 9)"
+    subsystem: spi
+    disposition: "planned: not yet read for a fact"
+  - name: bcm2711-system-timer
+    title: "System Timer (chapter 10)"
+    subsystem: timers
+    disposition: "spec:bcm2711#timers"
+  - name: bcm2711-pl011-uart
+    title: "PL011 UARTs (chapter 11)"
+    subsystem: uart
+    disposition: "spec:bcm2711#debug-uart"
+  - name: bcm2711-arm-timer
+    title: "Timer (ARM side) (chapter 12)"
+    subsystem: timers
+    disposition: "spec:bcm2711#timers"
+  - name: bcm2711-arm-mailboxes
+    title: "ARM mailboxes (chapter 13)"
+    subsystem: mailbox
+    disposition: "spec:bcm2711#arm-local-block"
+  - name: bcm2711-usb
+    title: "USB (section 1.1 peripheral list)"
+    subsystem: usb
+    disposition: "spec:bcm2711#usb-controllers"
+  - name: bcm2711-pcie
+    title: "PCIe address range (section 1.2.1, Figure 1)"
+    subsystem: pcie
+    disposition: "planned: not yet read for a fact"
+  # rock5t: rock5t-product-brief, section 3 (Hardware and Interfaces).
+  - name: rock5t-soc
+    title: "Rockchip RK3588 / RK3588J SoC"
+    subsystem: cpu
+    disposition: "spec:rock5t#cpu-complex"
+  - name: rock5t-lpddr5
+    title: "64-bit LPDDR5 RAM"
+    subsystem: memory
+    disposition: "spec:rock5t#ram-options"
+  - name: rock5t-emmc
+    title: "Onboard eMMC"
+    subsystem: storage
+    disposition: "spec:rock5t#boot-storage"
+  - name: rock5t-microsd
+    title: "Micro SD card slot"
+    subsystem: storage
+    disposition: "spec:rock5t#boot-storage"
+  - name: rock5t-m2-m-key
+    title: "2x M.2 M Key connectors (PCIe 3.0 two-lane)"
+    subsystem: storage
+    disposition: "spec:rock5t#boot-storage"
+  - name: rock5t-ethernet
+    title: "2x 2.5 Gigabit Ethernet ports"
+    subsystem: ethernet
+    disposition: "spec:rock5t#ethernet"
+  - name: rock5t-maskrom-button
+    title: "Maskrom button"
+    subsystem: boot
+    disposition: "spec:rock5t#maskrom-strap"
+  - name: rock5t-gpio-header
+    title: "40-pin GPIO header"
+    subsystem: gpio
+    disposition: "planned: pins other than the debug console not yet read for a fact"
+    note: "The debug-console pins are spec:rock5t#debug-console."
+  - name: rock5t-wifi-bt
+    title: "Wi-Fi 6 and BT 5.2"
+    subsystem: wireless
+    disposition: "planned: not yet read for a fact"
+  - name: rock5t-usb
+    title: "USB Type-C port and four USB Type-A host ports"
+    subsystem: usb
+    disposition: "planned: not yet read for a fact"
+  - name: rock5t-m2-b-key
+    title: "M.2 B Key connector and SIM card slot (4G module)"
+    subsystem: wireless
+    disposition: "planned: not yet read for a fact"
+  - name: rock5t-hdmi
+    title: "2x HDMI output and 1x HDMI input"
+    subsystem: display
+    disposition: "excluded: multimedia interface outside this root's boot bring-up scope"
+  - name: rock5t-mipi
+    title: "2x MIPI CSI camera and 1x MIPI DSI LCD interfaces"
+    subsystem: display
+    disposition: "excluded: multimedia interface outside this root's boot bring-up scope"
+  - name: rock5t-audio
+    title: "Headphone jack and 25-pin FPC (PDM, USB)"
+    subsystem: audio
+    disposition: "excluded: audio interface outside this root's boot bring-up scope"
+  - name: rock5t-rtc-battery
+    title: "RTC battery connector"
+    subsystem: misc
+    disposition: "planned: not yet read for a fact"
+  - name: rock5t-fan
+    title: "Fan socket with PWM control"
+    subsystem: misc
+    disposition: "planned: not yet read for a fact"
+  - name: rock5t-power-recovery-buttons
+    title: "Power button and recovery button"
+    subsystem: misc
+    disposition: "planned: not yet read for a fact"
+  - name: rock5t-led
+    title: "RGB power/status/user LED"
+    subsystem: misc
+    disposition: "planned: not yet read for a fact"

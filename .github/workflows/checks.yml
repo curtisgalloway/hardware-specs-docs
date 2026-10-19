@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           repository: curtisgalloway/driver-lab
-          ref: 4cac73979a79946749c7343cd2df864336b0b8fa
+          ref: a8499e3c0e2c35f1c59a0d2cb7d620f96731bf99
           path: .driver-lab
           persist-credentials: false
 
@@ -50,6 +50,10 @@ jobs:
 
       - name: Root marker, specs and verification records (spec.py check --require-license --require-verified)
         run: scripts/checks.sh --mode "$CHECKS_MODE" check .driver-lab
+        # The root keeps a corpus ledger (specs/corpus.yaml): also run spec.py corpus, which
+        # fails when the ledger is missing.
+        env:
+          REQUIRE_CORPUS: 1
 
       - name: Source anchors at their pins (spec.py resolve)
         run: scripts/checks.sh resolve .driver-lab
