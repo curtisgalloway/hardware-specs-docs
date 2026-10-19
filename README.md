@@ -117,10 +117,17 @@ To run the same checks locally:
 
 ```bash
 git clone https://github.com/curtisgalloway/driver-lab ../driver-lab
+git clone https://github.com/curtisgalloway/hardware-specs-usb ../hardware-specs-usb
 python3 -m venv .venv-spec
 .venv-spec/bin/pip install --require-hashes -r ../driver-lab/skills/spec-format/requirements.txt
-CHECKS_PYTHON=.venv-spec/bin/python RESOLVE_SRC=1 REQUIRE_CORPUS=1 scripts/checks.sh all ../driver-lab
+CHECKS_PYTHON=.venv-spec/bin/python RESOLVE_SRC=1 REQUIRE_CORPUS=1 scripts/checks.sh all ../driver-lab ../hardware-specs-usb/specs
 ```
+
+Every step reads one further root as context: the `specs/` directory of
+[hardware-specs-usb](https://github.com/curtisgalloway/hardware-specs-usb), the documents-only
+root of USB standards specs (xHCI, Type-C and so on). An SoC spec here composes a standards
+spec from it by naming it in an instance row (`instances[].ip: xhci`) instead of restating the
+standard. CI checks that root out at its `main` branch, beside this one.
 
 `scripts/checks.sh --mode main ...` applies the `main` policy instead of the default `pr`. The
 script needs bash and a Python with exactly the pinned packages (the interpreter in
