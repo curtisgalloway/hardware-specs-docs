@@ -30,9 +30,11 @@
 #
 # A further root is another spec root read beside specs/ so that overlays and references
 # resolve. It is context only: its findings are not reported here as such, but its own errors
-# make the root untrusted, and a reference into an untrusted root then fails here. hardware-specs-docs passes none; hardware-specs-permissive requires one,
-# hardware-specs-docs' specs/; hardware-specs-gpl requires two, hardware-specs-docs' specs/ then
-# hardware-specs-permissive's specs/.
+# make the root untrusted, and a reference into an untrusted root then fails here.
+# hardware-specs-docs requires one, hardware-specs-usb's specs/ (the USB standards root its SoC
+# specs compose from); hardware-specs-permissive requires one, hardware-specs-docs' specs/;
+# hardware-specs-gpl requires two, hardware-specs-docs' specs/ then hardware-specs-permissive's
+# specs/.
 #
 # RESOLVE_SRC=1 (CI sets it) makes the resolve step fetch each cited repository at its pinned
 # commit over HTTPS. An entry whose fetch exceeds SRC_FETCH_LIMIT_MB (default 50) or the
@@ -63,9 +65,13 @@ BOARD_FIT=
 BOARD_MISFIT=widgetchip-bsd-overlay.spec.yaml
 # Further licenses this marker accepts, proved with bsd.spec.yaml's BSD-3-Clause replaced:
 EXTRA_FIT_LICENSES=
-# How many further roots every step needs (the first is always the docs repository's specs/),
-# so the cross-repository overlay check never silently skips.
-REQUIRE_FURTHER=0
+# How many further roots every step needs, so the cross-repository overlay check never silently
+# skips. Here the one further root is hardware-specs-usb's specs/.
+REQUIRE_FURTHER=1
+# The overlay the cross-repository self-test places under this marker, beside a target in the
+# first further root. Empty: a documents-only overlay written by the self-test, since this
+# marker accepts no source license (the template's BSD overlay would fail the license gate).
+CROSS_OVERLAY=
 # widgetchip-src-overlay.spec.yaml (a src fact read from BSD-3-Clause source) beside
 # widgetchip.spec.yaml: 1 when this repository's marker accepts it, 0 when it must fail the gate.
 SRC_FIT=0
@@ -348,7 +354,25 @@ self_test() {
   if [ "${#further[@]}" -gt 0 ]; then
     echo "== self-test: an overlay here resolves against a spec in ${further[0]} only when both roots are read"
     make_root "$tmp/other" "${further[0]}/board-specs.yaml" "$FIXTURES/board/widgetchip.spec.yaml"
-    make_root "$tmp/overlay" specs/board-specs.yaml "$FIXTURES/board/widgetchip-bsd-overlay.spec.yaml"
+    if [ -n "$CROSS_OVERLAY" ]; then
+      make_root "$tmp/overlay" specs/board-specs.yaml "$FIXTURES/board/$CROSS_OVERLAY"
+    else
+      make_root "$tmp/overlay" specs/board-specs.yaml
+      cat > "$tmp/overlay/widgetchip-docs-overlay.spec.yaml" <<'OVERLAY'
+format: 2
+kind: overlay
+overlays: widgetchip
+resources:
+  documents:
+    - {name: widget-note, class: doc, title: Widget application note, url: "https://example.invalid/widget-note.pdf"}
+facts:
+  - id: docs-note
+    section: gotchas
+    title: Application note
+    claim: The application note repeats the reset time.
+    support: [{class: doc, doc: widget-note, at: [{heading: Reset}]}]
+OVERLAY
+    fi
     expect 1 "^[^ ]+: error: overlays 'widgetchip' resolves to no spec$" \
       "overlay without the second root" \
       "${PY[@]}" "$SPEC" check "$tmp/overlay" --require-license || return 1

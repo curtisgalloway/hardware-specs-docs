@@ -11,6 +11,10 @@
 #
 # The deploy job needs GitHub Pages enabled with GitHub Actions as its source. Until then the
 # build job still passes on main, and the deploy job fails at its Deploy step.
+#
+# Context roots, read so that root-qualified references and instances[].ip compositions into
+# them resolve:
+#   hardware-specs-usb/specs
 name: Publish spec views
 on:
   pull_request:
@@ -27,6 +31,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      usb_commit: ${{ steps.context.outputs.usb_commit }}
     steps:
       - name: Require an installed tool revision
         run: test "$TOOL_COMMIT" != 0000000000000000000000000000000000000000
@@ -39,10 +45,23 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: curtisgalloway/hardware-specs-usb
+          ref: main
+          path: ctx-usb
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
           repository: curtisgalloway/driver-lab
           ref: ${{ env.TOOL_COMMIT }}
           path: tooling
           persist-credentials: false
+      # The context repository is read at its main branch, as checks.yml reads it (spec data
+      # only, no code that runs here). Its commit is recorded so that the deploy job re-renders
+      # from exactly the same sources and every page's banner names it.
+      - name: Record context commits
+        id: context
+        run: |
+          echo "usb_commit=$(git -C ctx-usb rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
@@ -55,9 +74,10 @@ jobs:
           SOURCE_COMMIT: ${{ github.sha }}
           VERIFY_POLICY: ${{ github.event_name == 'pull_request' && 'pr' || 'main' }}
           GITHUB_TOKEN: ${{ github.token }}
+          USB_COMMIT: ${{ steps.context.outputs.usb_commit }}
         run: |
-          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py build repo/specs --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified "$VERIFY_POLICY" --fetch-anchors
-          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py verify repo/specs --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified "$VERIFY_POLICY"
+          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py build repo/specs --context-root ctx-usb/specs --source-commit "ctx-usb/specs=$USB_COMMIT" --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified "$VERIFY_POLICY" --fetch-anchors
+          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py verify repo/specs --context-root ctx-usb/specs --source-commit "ctx-usb/specs=$USB_COMMIT" --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified "$VERIFY_POLICY"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: spec-views
@@ -85,6 +105,12 @@ jobs:
           persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          repository: curtisgalloway/hardware-specs-usb
+          ref: ${{ needs.build.outputs.usb_commit }}
+          path: ctx-usb
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
           repository: curtisgalloway/driver-lab
           ref: ${{ env.TOOL_COMMIT }}
           path: tooling
@@ -103,8 +129,9 @@ jobs:
       - name: Refuse incomplete or altered site before deploying
         env:
           SOURCE_COMMIT: ${{ github.sha }}
+          USB_COMMIT: ${{ needs.build.outputs.usb_commit }}
         run: |
-          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py verify repo/specs --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified main
+          "$RUNNER_TEMP/spec-venv/bin/python" tooling/skills/spec-format/ci/publish.py verify repo/specs --context-root ctx-usb/specs --source-commit "ctx-usb/specs=$USB_COMMIT" --out site --source-commit "repo/specs=$SOURCE_COMMIT" --tool-commit "$TOOL_COMMIT" --require-verified main
       # Prepare the Pages tar locally: upload-pages-artifact nests a mutable
       # upload-artifact@v4 even when the composite itself is pinned by SHA.
       - name: Archive verified Pages site
