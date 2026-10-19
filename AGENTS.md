@@ -31,10 +31,14 @@ Instructions for coding agents working in this repository. The user guide is the
   record is `specs/resources/<name>.verify.yaml`. A fact's `id` is stable: never reuse or rename
   one, since verdicts and other repositories' references name it. After editing a spec, re-run
   `spec-verifier` on the changed facts (`spec.py status --stale` lists them).
+- **Corpus ledger and indexes:** `specs/corpus.yaml` is the root's corpus ledger and
+  `specs/index/` its document indexes (the contract's "Corpus ledger" and "Document indexes").
+  When a spec lists a new document, add it to the ledger; regenerate an index with
+  `spec.py index`, never edit one, and never commit the document itself.
 - **Generated views:** the Markdown view and the viewer are built by CI (`publish.yml`) and
   published to the repository's GitHub Pages site; never commit or hand-edit a view.
-- **Checks:** `CHECKS_PYTHON=<venv>/bin/python RESOLVE_SRC=1 scripts/checks.sh all <driver-lab
-  checkout>` runs what CI runs; the venv holds driver-lab's
+- **Checks:** `CHECKS_PYTHON=<venv>/bin/python RESOLVE_SRC=1 REQUIRE_CORPUS=1 scripts/checks.sh
+  all <driver-lab checkout>` runs what CI runs; the venv holds driver-lab's
   `skills/spec-format/requirements.txt`, installed with `pip install --require-hashes`. The
   default `--mode pr` is the pull-request policy; CI runs `--mode main` on `main`. CI pins
   driver-lab to the commit in `.github/workflows/checks.yml`, and `publish.yml`'s `TOOL_COMMIT`
